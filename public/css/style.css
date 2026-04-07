@@ -1,0 +1,18 @@
+body {
+    background-color: yellow;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+@media (max-width: 600px) {
+    body {
+        font-size: 14px;
+    }
+}
+
+@media (min-width: 601px) {
+    body {
+        font-size: 16px;
+    }
+}
