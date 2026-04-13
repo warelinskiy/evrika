@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Эврика | Платформа обучения Java</title>
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&family=Material+Symbols+Outlined" rel="stylesheet">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- TOP NAVIGATION -->
+<nav class="top-nav glass-nav">
+  <div class="nav-inner">
+    <a class="nav-brand" onclick="showPage('landing')">
+      <span class="nav-brand-icon eureka-gradient">
+        <span class="material-symbols-outlined">lightbulb</span>
+      </span>
+      Эврика
+    </a>
+    
+    <div class="nav-links">
+      <button class="nav-link" data-page="landing" onclick="showPage('landing')">Главная</button>
+      <button class="nav-link" data-page="courses" onclick="showPage('courses')">Курсы</button>
+    </div>
+    
+    <div class="nav-actions">
+      <div class="lang-toggle">
+        <button class="lang-btn active" data-lang="ru">RU</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+      <button class="icon-btn dark-mode-btn" onclick="toggleDarkMode()">
+        <span class="material-symbols-outlined">dark_mode</span>
+      </button>
+      
+      <!-- Контейнер для авторизации -->
+      <div id="auth-container" style="display: flex; gap: 0.5rem;">
+        <button id="auth-trigger-btn" class="btn-secondary">Войти</button>
+      </div>
+      
+      <!-- Меню пользователя (скрыто по умолчанию) -->
+      <div id="user-menu" class="user-menu" style="display: none;">
+        <div class="user-avatar" id="user-avatar"></div>
+        <span id="user-name"></span>
+        <button class="icon-btn" onclick="logout()">
+          <span class="material-symbols-outlined">logout</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Модальное окно авторизации -->
+<div id="auth-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Добро пожаловать</h2>
+      <button class="modal-close">&times;</button>
+    </div>
+    
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Вход</button>
+      <button class="auth-tab" data-tab="register">Регистрация</button>
+    </div>
+    
+    <div id="auth-error" class="auth-error"></div>
+    
+    <div id="login-form">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" id="login-email" class="form-input" placeholder="example@mail.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Пароль</label>
+        <input type="password" id="login-password" class="form-input" placeholder="••••••">
+      </div>
+      <button id="login-submit" class="btn-primary" style="width: 100%;">Войти</button>
+    </div>
+    
+    <div id="register-form" style="display: none;">
+      <div class="form-group">
+        <label class="form-label">Имя</label>
+        <input type="text" id="register-name" class="form-input" placeholder="Ваше имя">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" id="register-email" class="form-input" placeholder="example@mail.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Пароль</label>
+        <input type="password" id="register-password" class="form-input" placeholder="минимум 6 символов">
+      </div>
+      <button id="register-submit" class="btn-primary" style="width: 100%;">Зарегистрироваться</button>
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно создания курса -->
+<div id="create-course-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Создать курс</h2>
+      <button class="modal-close" onclick="closeCreateCourseModal()">&times;</button>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Название курса</label>
+      <input type="text" id="course-title" class="form-input" placeholder="Введите название">
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Описание</label>
+      <textarea id="course-description" class="form-textarea" placeholder="Расскажите о курсе"></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Иконка (эмодзи)</label>
+      <input type="text" id="course-icon" class="form-input" placeholder="📚" maxlength="2">
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Уровень сложности</label>
+      <select id="course-level" class="form-select">
+        <option value="Начинающий">Начинающий</option>
+        <option value="Средний">Средний</option>
+        <option value="Продвинутый">Продвинутый</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Видимость</label>
+      <input type="hidden" id="course-visibility" value="public">
+      <div class="visibility-options">
+        <div class="visibility-option selected" data-value="public" onclick="setVisibility('public')">
+          <span class="material-symbols-outlined">public</span>
+          <span>Для всех</span>
+        </div>
+        <div class="visibility-option" data-value="link" onclick="setVisibility('link')">
+          <span class="material-symbols-outlined">link</span>
+          <span>По ссылке</span>
+        </div>
+        <div class="visibility-option" data-value="private" onclick="setVisibility('private')">
+          <span class="material-symbols-outlined">lock</span>
+          <span>Только я</span>
+        </div>
+      </div>
+    </div>
+    
+    <button id="create-course-submit" class="btn-primary" style="width: 100%;">Создать курс</button>
+  </div>
+</div>
+
+<!-- СТРАНИЦЫ -->
+
+<!-- Лендинг -->
+<div id="page-landing" class="page">
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <h1 class="hero-title">Учись Java бесплатно в интерактивной игровой системе</h1>
+        <p class="hero-subtitle">Осваивай программирование, создавай свои тесты и делись знаниями с другими.</p>
+        <div class="hero-actions">
+          <button class="btn-primary lg" onclick="showPage('courses')">Начать обучение</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Курсы -->
+<div id="page-courses" class="page">
+  <div class="courses-page" style="padding-top: 5rem;">
+    <div class="section-inner">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="section-title">Курсы программирования</h1>
+        <button id="create-course-btn" class="btn-primary">
+          <span class="material-symbols-outlined">add</span>
+          Создать курс
+        </button>
+      </div>
+      <div id="courses-container" class="courses-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Детали курса -->
+<div id="page-course-detail" class="page">
+  <div class="courses-page" style="padding-top: 5rem;">
+    <div class="section-inner" id="course-detail-container"></div>
+  </div>
+</div>
+
+<!-- Детали урока -->
+<div id="page-lesson-detail" class="page">
+  <div class="courses-page" style="padding-top: 5rem;">
+    <div class="section-inner" id="lesson-detail-container"></div>
+  </div>
+</div>
+
+<!-- Профиль -->
+<div id="page-profile" class="page">
+  <div class="profile-page" style="padding-top: 5rem;">
+    <div class="section-inner" id="profile-content"></div>
+  </div>
+</div>
+
+<!-- Скрипты -->
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/courses.js"></script>
+<script src="js/lessons.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
