@@ -134,18 +134,18 @@ function openCreateCourseModal() {
   if (modal) modal.classList.add('active');
 }
 
-function closeCreateCourseModal() {
+window.closeCreateCourseModal = function() {
   const modal = document.getElementById('create-course-modal');
   if (modal) modal.classList.remove('active');
-}
+};
 
-function setVisibility(value) {
+window.setVisibility = function(value) {
   document.querySelectorAll('.visibility-option').forEach(opt => {
     opt.classList.toggle('selected', opt.dataset.value === value);
   });
   const visibilityInput = document.getElementById('course-visibility');
   if (visibilityInput) visibilityInput.value = value;
-}
+};
 
 async function createCourse() {
   if (!currentUser) return;
@@ -157,7 +157,7 @@ async function createCourse() {
     level: document.getElementById('course-level')?.value,
     visibility: document.getElementById('course-visibility')?.value,
     authorId: currentUser.uid,
-    author: currentUser.displayName || currentUser.email,
+    author: window.userData?.name || currentUser.displayName || currentUser.email,
     lessons: 0,
     createdAt: new Date()
   };
