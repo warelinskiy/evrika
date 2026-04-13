@@ -154,7 +154,7 @@ async function register() {
       bio: '',
       location: '',
       website: '',
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      createdAt: new Date(),
       completedLessons: [],
       courseProgress: {}
     });
@@ -213,8 +213,6 @@ function updateUIForLoggedInUser() {
     if (userAvatar) userAvatar.textContent = window.userData.avatar || '👤';
     if (authContainer) authContainer.style.display = 'none';
     if (userMenu) userMenu.style.display = 'flex';
-    updateProgressDisplay();
-    if (typeof renderProfile === 'function') renderProfile();
   }
 }
 
@@ -225,7 +223,7 @@ function updateUIForLoggedOutUser() {
   if (userMenu) userMenu.style.display = 'none';
 }
 
-async function saveProgress(courseId, lessonId) {
+window.saveProgress = async function(courseId, lessonId) {
   if (!currentUser) return;
   try {
     const userRef = db.collection('users').doc(currentUser.uid);
@@ -239,24 +237,11 @@ async function saveProgress(courseId, lessonId) {
         [`courseProgress.${courseId}`]: completedLessons.filter(l => l.startsWith(courseId)).length
       });
       if (window.userProgress) window.userProgress.completedLessons = completedLessons;
-      updateProgressDisplay();
     }
   } catch (error) {
     console.error('Ошибка сохранения прогресса:', error);
   }
-}
-
-function updateProgressDisplay() {
-  const completedCount = window.userProgress?.completedLessons?.length || 0;
-  const totalLessons = 18;
-  const percentage = Math.round((completedCount / totalLessons) * 100);
-  
-  const progressFill = document.querySelector('.progress-bar-fill');
-  const progressPct = document.querySelector('.sidebar-progress-pct');
-  
-  if (progressFill) progressFill.style.width = `${percentage}%`;
-  if (progressPct) progressPct.textContent = `${percentage}%`;
-}
+};
 
 // Слушатель авторизации
 auth.onAuthStateChanged(async (user) => {
@@ -284,6 +269,16 @@ document.addEventListener('DOMContentLoaded', () => {
   if (modal) {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) closeAuthModal();
+    });
+  }
+  
+  // Клик по аватару для перехода в профиль
+  const userAvatar = document.getElementById('user-avatar');
+  if (userAvatar) {
+    userAvatar.addEventListener('click', () => {
+      if (currentUser) {
+        showPage('profile');
+      }
     });
   }
   
