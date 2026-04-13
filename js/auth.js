@@ -35,12 +35,12 @@ function showError(message) {
   }
 }
 
-function showLoginForm() {
+window.showLoginForm = function() {
   const loginForm = document.getElementById('login-form');
   const registerForm = document.getElementById('register-form');
   if (loginForm) loginForm.style.display = 'block';
   if (registerForm) registerForm.style.display = 'none';
-}
+};
 
 window.showRegisterForm = function() {
   const loginForm = document.getElementById('login-form');
@@ -50,13 +50,13 @@ window.showRegisterForm = function() {
   renderAvatarGrid();
 };
 
-function openAuthModal() {
+window.openAuthModal = function() {
   const modal = document.getElementById('auth-modal');
   if (modal) {
     modal.classList.add('active');
     showLoginForm();
   }
-}
+};
 
 window.closeAuthModal = function() {
   const modal = document.getElementById('auth-modal');
@@ -64,6 +64,8 @@ window.closeAuthModal = function() {
     modal.classList.remove('active');
     const inputs = modal.querySelectorAll('input');
     inputs.forEach(input => input.value = '');
+    const errorDiv = document.getElementById('auth-error');
+    if (errorDiv) errorDiv.style.display = 'none';
   }
 };
 
@@ -76,10 +78,8 @@ async function login() {
     return;
   }
   
-  // Проверяем, является ли ввод email'ом или username'ом
   let email = loginInput;
   if (!loginInput.includes('@')) {
-    // Это username, нужно найти email
     try {
       const usersSnapshot = await db.collection('users').where('username', '==', loginInput.toLowerCase()).get();
       if (usersSnapshot.empty) {
@@ -99,6 +99,7 @@ async function login() {
     await loadUserData(currentUser.uid);
     updateUIForLoggedInUser();
     closeAuthModal();
+    showNotification('Добро пожаловать!', 'success');
   } catch (error) {
     console.error('Ошибка входа:', error);
     if (error.code === 'auth/user-not-found') showError('Пользователь не найден');
@@ -119,7 +120,6 @@ async function register() {
     return;
   }
   
-  // Проверка username (только буквы, цифры, подчеркивание)
   const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
   if (!usernameRegex.test(username)) {
     showError('Username должен содержать 3-20 символов (буквы, цифры, _)');
@@ -131,7 +131,6 @@ async function register() {
     return;
   }
   
-  // Проверяем уникальность username
   try {
     const existingUser = await db.collection('users').where('username', '==', username.toLowerCase()).get();
     if (!existingUser.empty) {
@@ -146,7 +145,6 @@ async function register() {
     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
     await userCredential.user.updateProfile({ displayName: name });
     
-    // Сохраняем данные пользователя
     await db.collection('users').doc(userCredential.user.uid).set({
       uid: userCredential.user.uid,
       username: username.toLowerCase(),
@@ -165,6 +163,7 @@ async function register() {
     await loadUserData(currentUser.uid);
     updateUIForLoggedInUser();
     closeAuthModal();
+    showNotification('Регистрация успешна!', 'success');
   } catch (error) {
     console.error('Ошибка регистрации:', error);
     if (error.code === 'auth/email-already-in-use') showError('Email уже используется');
@@ -188,7 +187,7 @@ async function loadUserData(uid) {
   }
 }
 
-async function logout() {
+window.logout = async function() {
   try {
     await auth.signOut();
     currentUser = null;
@@ -196,10 +195,11 @@ async function logout() {
     window.userProgress = null;
     updateUIForLoggedOutUser();
     showPage('landing');
+    showNotification('Вы вышли из аккаунта', 'info');
   } catch (error) {
     console.error('Ошибка выхода:', error);
   }
-}
+};
 
 function updateUIForLoggedInUser() {
   const authContainer = document.getElementById('auth-container');
@@ -253,14 +253,12 @@ function updateProgressDisplay() {
   
   const progressFill = document.querySelector('.progress-bar-fill');
   const progressPct = document.querySelector('.sidebar-progress-pct');
-  const progressText = document.querySelector('.sidebar-progress-text');
   
   if (progressFill) progressFill.style.width = `${percentage}%`;
   if (progressPct) progressPct.textContent = `${percentage}%`;
-  if (progressText) progressText.textContent = `${percentage}% завершено`;
 }
 
-// Инициализация слушателя авторизации
+// Слушатель авторизации
 auth.onAuthStateChanged(async (user) => {
   currentUser = user;
   if (user) {
