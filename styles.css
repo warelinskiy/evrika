@@ -769,3 +769,178 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 .page { animation: fadeIn 250ms ease; }
+/* --- СТИЛИ ПРОФИЛЯ (TELEGRAM СТИЛЬ) --- */
+.profile-telegram {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.profile-avatar-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.profile-avatar-large {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  background: var(--primary-fixed);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.profile-avatar-large:hover {
+  transform: scale(1.05);
+}
+
+.profile-avatar-edit {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--primary);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.profile-avatar-large:hover .profile-avatar-edit {
+  opacity: 1;
+}
+
+.profile-avatar-edit .material-symbols-outlined {
+  font-size: 16px;
+  color: white;
+}
+
+.profile-info-section {
+  background: var(--surface-low);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.profile-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--surface-container);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.profile-field:last-child {
+  border-bottom: none;
+}
+
+.profile-field:hover {
+  background: var(--surface-container);
+}
+
+.profile-field-label {
+  font-size: 0.875rem;
+  color: var(--on-surface-variant);
+}
+
+.profile-field-value {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--on-surface);
+  font-weight: 500;
+}
+
+.profile-field-value .material-symbols-outlined {
+  font-size: 1.125rem;
+  color: var(--on-surface-variant);
+}
+
+.profile-stats-telegram {
+  display: flex;
+  justify-content: space-around;
+  background: var(--surface-low);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--on-surface-variant);
+}
+
+.profile-section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  margin: 1.5rem 0 0.75rem 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-actions-telegram {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.profile-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: none;
+  border-radius: 16px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  background: var(--surface-low);
+  color: var(--on-surface);
+}
+
+.profile-action-btn:hover {
+  background: var(--surface-container);
+}
+
+.profile-action-btn.logout {
+  color: #ef4444;
+}
+
+.profile-action-btn.delete {
+  color: #ef4444;
+}
+
+.profile-not-authorized {
+  text-align: center;
+  padding: 3rem;
+}
+
+.profile-not-authorized-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
