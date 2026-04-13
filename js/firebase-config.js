@@ -1,4 +1,4 @@
-// Firebase конфигурация для CDN версии
+// Firebase конфигурация
 const firebaseConfig = {
   apiKey: "AIzaSyC2ueIcLC3KHOtLN7tG7vdfMM2Sv1sYmSk",
   authDomain: "evrika-e2af7.firebaseapp.com",
