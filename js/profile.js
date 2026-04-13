@@ -2,10 +2,9 @@
 // МОДУЛЬ ПРОФИЛЯ
 // ============================================
 
-function renderProfile() {
+window.renderProfile = function() {
   if (!currentUser || !window.userData) {
     if (currentUser) {
-      // Ждем загрузки данных
       setTimeout(renderProfile, 500);
     }
     return;
@@ -27,12 +26,8 @@ function renderProfile() {
       <h1 class="profile-name">${escapeHtml(userData.name || '')}</h1>
       <p class="profile-username">@${escapeHtml(userData.username || '')}</p>
       ${userData.bio ? `<p class="profile-bio">${escapeHtml(userData.bio)}</p>` : ''}
-      <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem;">
-        ${userData.location ? `<span class="profile-location" style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; color: var(--on-surface-variant);"><span class="material-symbols-outlined" style="font-size: 1rem;">location_on</span> ${escapeHtml(userData.location)}</span>` : ''}
-        ${userData.website ? `<a href="${escapeHtml(userData.website)}" target="_blank" style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; color: var(--primary); text-decoration: none;"><span class="material-symbols-outlined" style="font-size: 1rem;">link</span> Сайт</a>` : ''}
-      </div>
       <div style="margin-top: 1rem;">
-        <button class="btn-secondary" onclick="openEditProfileModal()" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+        <button class="btn-secondary" onclick="openEditProfileModal()" style="padding: 0.5rem 1rem;">
           <span class="material-symbols-outlined" style="font-size: 1rem;">edit</span> Редактировать профиль
         </button>
       </div>
@@ -53,7 +48,7 @@ function renderProfile() {
       </div>
     </div>
   `;
-}
+};
 
 window.openEditProfileModal = function() {
   if (!window.userData) return;
