@@ -1,0 +1,421 @@
+/* =============================================
+   HERO БЛОКИ - ШАХМАТНЫЙ ПОРЯДОК
+   ============================================= */
+
+.landing-wrap {
+  padding-top: 5rem;
+}
+
+.hero-section {
+  padding: 5rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section.alt {
+  background: var(--surface-low);
+}
+
+.hero-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.hero-container.reverse {
+  direction: rtl;
+}
+
+.hero-container.reverse .hero-content,
+.hero-container.reverse .hero-visual {
+  direction: ltr;
+}
+
+/* Hero Content */
+.hero-content {
+  direction: ltr;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface-high);
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--on-surface-variant);
+  margin-bottom: 1.5rem;
+}
+
+.hero-badge-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--primary);
+  animation: pulse 2s infinite;
+}
+
+.hero-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--on-surface);
+  margin: 0 0 1.5rem;
+}
+
+.hero-title-small {
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--on-surface);
+  margin: 0 0 1.5rem;
+}
+
+.hero-title-large {
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 1.5rem;
+}
+
+.hero-description {
+  font-size: 1.125rem;
+  color: var(--on-surface-variant);
+  line-height: 1.7;
+  margin: 0 0 2rem;
+}
+
+.hero-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.btn-primary.lg, .btn-secondary.lg {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+}
+
+/* Hero Stats */
+.hero-stats {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--outline-variant);
+}
+
+.hero-stat {
+  text-align: center;
+}
+
+.hero-stat-value {
+  display: block;
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.hero-stat-label {
+  font-size: 0.75rem;
+  color: var(--on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hero-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.hero-stat-compact {
+  text-align: center;
+  padding: 1rem;
+  background: var(--surface-high);
+  border-radius: var(--radius-sm);
+}
+
+.hero-stat-compact .hero-stat-value {
+  font-size: 1.5rem;
+}
+
+/* Hero Visual */
+.hero-visual {
+  position: relative;
+}
+
+.hero-visual-glow {
+  position: absolute;
+  top: -5rem;
+  right: -5rem;
+  width: 24rem;
+  height: 24rem;
+  background: rgba(123, 84, 0, 0.05);
+  filter: blur(120px);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.hero-visual-card {
+  position: relative;
+  z-index: 1;
+  padding: 1rem;
+  background: var(--surface-low);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(172, 173, 179, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+}
+
+.hero-visual-inner {
+  aspect-ratio: 1;
+  background: var(--surface-lowest);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(172, 173, 179, 0.05);
+}
+
+.hero-visual-icon {
+  font-size: 6rem;
+  color: var(--primary);
+  opacity: 0.8;
+}
+
+/* Hero Feature Card */
+.hero-feature-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--surface-lowest);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(172, 173, 179, 0.08);
+  margin-top: 1.5rem;
+}
+
+.hero-feature-icon {
+  font-size: 2rem;
+  color: var(--primary);
+}
+
+.hero-feature-card h4 {
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.hero-feature-card p {
+  font-size: 0.875rem;
+  color: var(--on-surface-variant);
+}
+
+/* Process Steps */
+.process-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.process-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.step-number {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.125rem;
+  color: var(--on-primary-fixed);
+  flex-shrink: 0;
+}
+
+.process-step h4 {
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.process-step p {
+  font-size: 0.875rem;
+  color: var(--on-surface-variant);
+}
+
+/* Features Grid Compact */
+.features-grid-compact {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.feature-compact {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--surface-high);
+  border-radius: var(--radius-sm);
+}
+
+.feature-compact .material-symbols-outlined {
+  color: var(--primary);
+  font-size: 1.5rem;
+}
+
+.feature-compact span:last-child {
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+/* Testimonial Card */
+.testimonial-card {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--surface-low);
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+}
+
+.testimonial-avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: var(--surface-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.testimonial-text {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--on-surface);
+  margin-bottom: 0.5rem;
+}
+
+.testimonial-author {
+  font-size: 0.75rem;
+  color: var(--on-surface-variant);
+}
+
+/* CTA Section */
+.cta-section {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  margin: 2rem 0;
+  border-radius: 0;
+}
+
+.cta-section .hero-content,
+.cta-section .hero-visual-card {
+  background: transparent;
+}
+
+.cta-section .hero-description {
+  color: var(--on-primary-fixed);
+  opacity: 0.9;
+}
+
+.cta-section .hero-visual-icon {
+  color: var(--on-primary-fixed);
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+  .hero-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .hero-container.reverse {
+    direction: ltr;
+  }
+  
+  .hero-section {
+    padding: 3rem 0;
+  }
+  
+  .hero-stats {
+    justify-content: center;
+  }
+  
+  .hero-visual {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .hero-title {
+    text-align: center;
+  }
+  
+  .hero-description {
+    text-align: center;
+  }
+  
+  .hero-buttons {
+    justify-content: center;
+  }
+  
+  .hero-stats {
+    justify-content: center;
+  }
+  
+  .hero-feature-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .process-step {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+  
+  .features-grid-compact {
+    grid-template-columns: 1fr;
+  }
+  
+  .testimonial-card {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
