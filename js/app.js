@@ -1,10 +1,11 @@
 // ============================================
-// ОСНОВНОЙ ФАЙЛ ПРИЛОЖЕНИЯ - ГЛОБАЛЬНЫЕ ФУНКЦИИ
+// ОСНОВНОЙ ФАЙЛ ПРИЛОЖЕНИЯ
 // ============================================
 
-// Глобальные функции для вызова из HTML
+// ========== ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЛЯ КНОПОК ==========
+
 window.showPage = function(pageId) {
-  console.log('showPage called:', pageId);
+  console.log('showPage вызвана:', pageId);
   
   // Скрываем все страницы
   document.querySelectorAll('.page').forEach(page => {
@@ -15,31 +16,27 @@ window.showPage = function(pageId) {
   const targetPage = document.getElementById(`page-${pageId}`);
   if (targetPage) {
     targetPage.classList.add('active');
-    console.log('Page shown:', pageId);
+    console.log('Страница показана:', pageId);
   } else {
-    console.error('Page not found:', pageId);
+    console.error('Страница не найдена:', pageId);
   }
   
-  // Обновляем активные ссылки в навигации
+  // Обновляем активные ссылки
   document.querySelectorAll('.nav-link, .mobile-nav-btn').forEach(link => {
     link.classList.remove('active');
-    if (link.getAttribute('onclick')?.includes(`'${pageId}'`) || 
-        link.getAttribute('onclick')?.includes(`"${pageId}"`)) {
-      link.classList.add('active');
-    }
   });
   
-  // Дополнительная логика
+  // Загружаем данные для страницы
   if (pageId === 'courses' && typeof loadCourses === 'function') {
     loadCourses();
-  } else if (pageId === 'profile' && typeof renderProfile === 'function') {
-    renderProfile();
+  } else if (pageId === 'profile') {
+    renderProfilePage();
   }
   
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// Перевод
+// ========== ПЕРЕВОДЫ ==========
 const translations = {
   ru: {
     nav_login: 'Войти',
@@ -65,7 +62,7 @@ const translations = {
     stat_2: 'Быстрее обучение',
     stat_3: 'Доступность системы',
     create_title: 'Создавай и зарабатывай',
-    create_text: 'Наша платформа позволяет не только учиться, но и становиться автором. Публикуйте свои собственные тесты и практические задачи.',
+    create_text: 'Наша платформа позволяет не только учиться, но и становиться автором.',
     create_card_title: 'Монетизируйте свои знания',
     create_card_text: 'Зарабатывайте баллы и реальные бонусы за популярные курсы',
     science_title: 'Научный подход к обучению',
@@ -217,7 +214,6 @@ window.setLanguage = function(lang) {
   });
 };
 
-// Уведомления
 window.showNotification = function(message, type = 'info') {
   const notification = document.createElement('div');
   notification.style.cssText = `
@@ -243,14 +239,80 @@ window.escapeHtml = function(text) {
   return div.innerHTML;
 };
 
-// Инициализация при загрузке
+// ========== РЕНДЕР ПРОФИЛЯ ==========
+window.renderProfilePage = function() {
+  if (!currentUser) {
+    openAuthModal();
+    return;
+  }
+  
+  const container = document.getElementById('profile-container');
+  if (!container) return;
+  
+  // Ждем данные пользователя
+  if (!window.userData) {
+    container.innerHTML = '<div style="text-align: center; padding: 2rem;">Загрузка профиля...</div>';
+    setTimeout(renderProfilePage, 500);
+    return;
+  }
+  
+  const userData = window.userData;
+  const completedCount = window.userProgress?.completedLessons?.length || 0;
+  const totalLessons = 18;
+  const percentage = Math.round((completedCount / totalLessons) * 100);
+  
+  container.innerHTML = `
+    <div class="profile-header">
+      <div class="profile-avatar-large" onclick="openEditProfileModal()">
+        ${userData.avatar || '👤'}
+      </div>
+      <h1 class="profile-name">${escapeHtml(userData.name || '')}</h1>
+      <p class="profile-username">@${escapeHtml(userData.username || '')}</p>
+      ${userData.bio ? `<p class="profile-bio">${escapeHtml(userData.bio)}</p>` : ''}
+      <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.5rem;">
+        ${userData.location ? `<span style="font-size: 0.875rem; color: var(--on-surface-variant);">📍 ${escapeHtml(userData.location)}</span>` : ''}
+      </div>
+      <div style="margin-top: 1rem;">
+        <button class="btn-secondary" onclick="openEditProfileModal()" style="padding: 0.5rem 1rem;">
+          <span class="material-symbols-outlined" style="font-size: 1rem;">edit</span> Редактировать профиль
+        </button>
+      </div>
+    </div>
+    
+    <div class="profile-stats">
+      <div class="stat-card">
+        <div class="stat-value">${completedCount}</div>
+        <div class="stat-label">Пройдено уроков</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${percentage}%</div>
+        <div class="stat-label">Прогресс</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${Math.floor(completedCount * 2)}</div>
+        <div class="stat-label">Часов обучения</div>
+      </div>
+    </div>
+    
+    <div style="margin-top: 2rem; text-align: center;">
+      <button class="btn-primary" onclick="showPage('courses')" style="margin-right: 1rem;">
+        <span class="material-symbols-outlined">menu_book</span> Продолжить обучение
+      </button>
+      <button class="btn-secondary" onclick="logout()">
+        <span class="material-symbols-outlined">logout</span> Выйти
+      </button>
+    </div>
+  `;
+};
+
+// ========== ИНИЦИАЛИЗАЦИЯ ==========
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM fully loaded');
+  console.log('DOM загружен');
   
   // Устанавливаем язык
   setLanguage(currentLang);
   
-  // Закрытие модальных окон по клику на оверлей
+  // Закрытие модальных окон
   document.querySelectorAll('.modal-overlay').forEach(modal => {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
@@ -259,6 +321,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   
-  // Показываем landing page по умолчанию
+  // Показываем главную страницу
   showPage('landing');
 });
