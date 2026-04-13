@@ -14,12 +14,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   
   <style>
-    /* =============================================
-       ЭВРИКА — ВСТРОЕННЫЕ СТИЛИ
-       ============================================= */
-    
-    /* --- Base & Resets --- */
-    *, *::before, *::after { box-sizing: border-box; }
+    /* ========== ПОЛНЫЙ ДИЗАЙН ========== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
       --surface: #f6f6fd;
@@ -28,29 +24,18 @@
       --surface-high: #e1e2eb;
       --surface-highest: #dbdce6;
       --surface-lowest: #ffffff;
-      --surface-dim: #d2d4de;
-      --inverse-surface: #0c0e13;
       --on-surface: #2d2f34;
       --on-surface-variant: #5a5b61;
-      --outline: #75777d;
       --outline-variant: #acadb3;
       --primary: #7b5400;
       --primary-fixed: #feb300;
       --primary-fixed-dim: #eda600;
-      --primary-container: #feb300;
       --on-primary-fixed: #382400;
-      --on-primary-container: #523700;
-      --tertiary-container: #f6e14a;
-      --on-tertiary-container: #5a5100;
-      --secondary: #5c5b5b;
-      --error: #b02500;
-      --error-container: #f95630;
       --gradient-start: #FFD54F;
       --gradient-end: #FFB300;
       --transition: 200ms ease-out;
       --radius-sm: 1rem;
       --radius-lg: 2rem;
-      --radius-xl: 3rem;
       --radius-full: 9999px;
     }
 
@@ -61,54 +46,23 @@
       --surface-high: #24252f;
       --surface-highest: #2a2b36;
       --surface-lowest: #0e0f14;
-      --surface-dim: #0c0d12;
-      --inverse-surface: #e8e9f0;
       --on-surface: #e4e5ec;
       --on-surface-variant: #a8abb6;
-      --outline: #8a8d9a;
       --outline-variant: #44475a;
     }
 
-    html { scroll-behavior: smooth; }
-
     body {
       font-family: 'Inter', sans-serif;
-      background-color: var(--surface);
+      background: var(--surface);
       color: var(--on-surface);
-      font-weight: 500;
       margin: 0;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* --- Typography --- */
-    .font-headline { font-family: 'Manrope', sans-serif; }
-    .font-body { font-family: 'Inter', sans-serif; }
-
-    /* --- Material Symbols --- */
-    .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-      display: inline-block;
-      line-height: 1;
-      vertical-align: middle;
-      user-select: none;
-    }
-
-    /* --- Eureka Gradient --- */
-    .eureka-gradient {
-      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
-    }
-    .eureka-gradient-text {
-      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    /* --- Glass Nav --- */
+    /* Navigation */
     .glass-nav {
       background: rgba(246, 246, 253, 0.72);
       backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       position: fixed;
       top: 0;
       left: 0;
@@ -116,11 +70,8 @@
       z-index: 50;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    .dark .glass-nav {
-      background: rgba(19, 20, 26, 0.72);
-    }
+    .dark .glass-nav { background: rgba(19, 20, 26, 0.72); }
 
-    /* --- Navigation --- */
     .nav-inner {
       max-width: 1600px;
       margin: 0 auto;
@@ -134,19 +85,18 @@
       font-family: 'Manrope', sans-serif;
       font-size: 1.25rem;
       font-weight: 800;
-      letter-spacing: -0.03em;
       color: var(--on-surface);
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      text-decoration: none;
     }
 
     .nav-brand-icon {
       width: 2rem;
       height: 2rem;
       border-radius: 0.625rem;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -157,51 +107,36 @@
       align-items: center;
       gap: 2rem;
       font-family: 'Manrope', sans-serif;
-      font-size: 0.875rem;
       font-weight: 600;
     }
 
     .nav-link {
       color: var(--on-surface-variant);
-      text-decoration: none;
-      transition: color var(--transition);
       cursor: pointer;
       background: none;
       border: none;
-      font-family: inherit;
-      font-size: inherit;
-      font-weight: inherit;
-      padding: 0;
+      font-size: 0.875rem;
+      transition: color var(--transition);
     }
-    .nav-link:hover, .nav-link.active { color: var(--primary-fixed-dim); }
+    .nav-link:hover { color: var(--primary-fixed-dim); }
 
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
+    .nav-actions { display: flex; align-items: center; gap: 1rem; }
 
     .icon-btn {
       background: none;
       border: none;
       cursor: pointer;
       color: var(--on-surface-variant);
-      display: flex;
-      align-items: center;
-      justify-content: center;
       padding: 0.25rem;
       border-radius: var(--radius-sm);
-      transition: color var(--transition);
     }
     .icon-btn:hover { color: var(--primary-fixed-dim); }
 
-    /* --- Language Toggle --- */
     .lang-toggle {
       display: flex;
       background: var(--surface-low);
       border-radius: var(--radius-full);
       padding: 0.2rem;
-      gap: 0;
     }
     .lang-btn {
       padding: 0.3rem 0.9rem;
@@ -209,9 +144,7 @@
       border: none;
       font-size: 0.75rem;
       font-weight: 700;
-      font-family: 'Manrope', sans-serif;
       cursor: pointer;
-      transition: all var(--transition);
       background: transparent;
       color: var(--on-surface-variant);
     }
@@ -221,9 +154,8 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
 
-    /* --- Buttons --- */
     .btn-primary {
-      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
       color: var(--on-primary-fixed);
       border: none;
       border-radius: var(--radius-full);
@@ -232,15 +164,12 @@
       font-weight: 700;
       font-size: 0.875rem;
       cursor: pointer;
-      transition: transform var(--transition), box-shadow var(--transition);
-      box-shadow: 0 2px 8px rgba(255,179,0,0.25);
-      text-decoration: none;
+      transition: transform var(--transition);
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
     }
-    .btn-primary:hover { transform: scale(1.02); box-shadow: 0 4px 16px rgba(255,179,0,0.35); }
-    .btn-primary:active { transform: scale(0.97); }
+    .btn-primary:hover { transform: scale(1.02); }
     .btn-primary.lg { padding: 1rem 2.5rem; font-size: 1.0625rem; }
 
     .btn-secondary {
@@ -253,81 +182,56 @@
       font-weight: 700;
       font-size: 0.875rem;
       cursor: pointer;
-      transition: background var(--transition);
     }
     .btn-secondary:hover { background: var(--surface-highest); }
 
-    /* --- Pages --- */
+    /* Pages */
     .page { display: none; }
     .page.active { display: block; }
 
-    /* --- Landing Page --- */
+    /* Hero */
     .landing-wrap { padding-top: 5rem; }
-
-    .hero {
-      padding: 5rem 0 4rem;
-      overflow: hidden;
-      position: relative;
-    }
+    .hero { padding: 5rem 0 4rem; }
     .hero-inner {
       max-width: 1280px;
       margin: 0 auto;
       padding: 0 2rem;
-      display: grid;
-      grid-template-columns: 7fr 5fr;
-      gap: 3rem;
-      align-items: center;
+      text-align: center;
     }
-    @media (max-width: 1024px) {
-      .hero-inner { grid-template-columns: 1fr; }
-      .hero-visual { display: none; }
-    }
-
     .hero-title {
       font-family: 'Manrope', sans-serif;
       font-size: clamp(2.5rem, 5vw, 4.5rem);
       font-weight: 800;
       line-height: 1.1;
-      letter-spacing: -0.02em;
       color: var(--on-surface);
-      margin: 0 0 1.5rem;
+      margin-bottom: 1.5rem;
     }
-
     .hero-subtitle {
       font-size: 1.125rem;
       color: var(--on-surface-variant);
       line-height: 1.7;
       max-width: 40rem;
-      margin: 0 0 2rem;
+      margin: 0 auto 2rem;
     }
+    .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 
-    .hero-actions { display: flex; flex-wrap: wrap; gap: 1rem; }
-
-    /* --- Courses Page --- */
+    /* Courses */
     .courses-page { padding-top: 5rem; min-height: 100vh; }
-
-    .section-inner {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 0 2rem;
-    }
-
+    .section-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
     .section-title {
       font-family: 'Manrope', sans-serif;
       font-size: clamp(1.75rem, 3vw, 2.5rem);
       font-weight: 800;
       color: var(--on-surface);
-      letter-spacing: -0.02em;
-      margin: 0 0 1rem;
+      margin-bottom: 1rem;
     }
-
-    /* --- Flex Utilities --- */
     .flex { display: flex; }
     .justify-between { justify-content: space-between; }
     .items-center { align-items: center; }
     .mb-8 { margin-bottom: 2rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mt-2 { margin-top: 0.5rem; }
 
-    /* --- Courses Grid --- */
     .courses-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -343,23 +247,16 @@
       transition: transform var(--transition), box-shadow var(--transition);
       cursor: pointer;
     }
-
     .course-card:hover {
       transform: translateY(-4px);
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
     }
-
     .course-card-header {
       background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
       padding: 2rem;
       text-align: center;
     }
-
-    .course-card-header-icon {
-      font-size: 3rem;
-      color: var(--on-primary-fixed);
-    }
-
+    .course-card-header-icon { font-size: 3rem; }
     .course-card-title {
       font-family: 'Manrope', sans-serif;
       font-size: 1.25rem;
@@ -367,31 +264,66 @@
       margin: 1rem 0 0.5rem;
       color: var(--on-primary-fixed);
     }
-
-    .course-card-meta {
-      font-size: 0.75rem;
-      color: rgba(56, 36, 0, 0.8);
-    }
-
-    .course-card-body {
-      padding: 1.5rem;
-    }
-
+    .course-card-meta { font-size: 0.75rem; color: rgba(56, 36, 0, 0.8); }
+    .course-card-body { padding: 1.5rem; }
     .course-card-description {
       font-size: 0.875rem;
       color: var(--on-surface-variant);
       line-height: 1.6;
       margin-bottom: 1rem;
     }
+    .course-card-stats { display: flex; gap: 1rem; font-size: 0.75rem; color: var(--on-surface-variant); }
 
-    .course-card-stats {
+    /* Lessons */
+    .lessons-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .lesson-item {
       display: flex;
-      gap: 1rem;
-      font-size: 0.75rem;
-      color: var(--on-surface-variant);
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      background: var(--surface-low);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background var(--transition);
     }
+    .lesson-item:hover { background: var(--surface-container); }
+    .lesson-left { display: flex; align-items: center; gap: 1rem; }
+    .lesson-number {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      background: var(--surface-container);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+    .lesson-title { font-weight: 600; }
+    .lesson-duration { font-size: 0.75rem; color: var(--on-surface-variant); }
 
-    /* --- Modals --- */
+    /* Lesson Content */
+    .lesson-content {
+      background: var(--surface-lowest);
+      border-radius: var(--radius-sm);
+      padding: 2rem;
+    }
+    .lesson-content h1 {
+      font-family: 'Manrope', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+    .lesson-content h2 {
+      font-family: 'Manrope', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 1.5rem 0 1rem;
+    }
+    .lesson-content p { line-height: 1.7; margin-bottom: 1rem; color: var(--on-surface-variant); }
+    .lesson-content ul { margin: 1rem 0; padding-left: 1.5rem; }
+    .lesson-content li { margin: 0.5rem 0; }
+
+    /* Modals */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -408,153 +340,61 @@
       visibility: hidden;
       transition: all var(--transition);
     }
-
-    .modal-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
+    .modal-overlay.active { opacity: 1; visibility: visible; }
     .modal {
       background: var(--surface-lowest);
       border-radius: var(--radius-lg);
-      max-width: 500px;
+      max-width: 450px;
       width: 90%;
-      max-height: 85vh;
-      overflow-y: auto;
       padding: 2rem;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     }
-
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--surface-container);
     }
-
     .modal-title {
       font-family: 'Manrope', sans-serif;
       font-size: 1.5rem;
       font-weight: 800;
-      color: var(--on-surface);
     }
-
     .modal-close {
       background: none;
       border: none;
-      cursor: pointer;
       font-size: 1.5rem;
+      cursor: pointer;
       color: var(--on-surface-variant);
     }
-
-    /* --- Forms --- */
-    .form-group {
-      margin-bottom: 1.25rem;
-    }
-
+    .form-group { margin-bottom: 1.25rem; }
     .form-label {
       display: block;
       font-size: 0.875rem;
       font-weight: 600;
       margin-bottom: 0.5rem;
-      color: var(--on-surface);
     }
-
-    .form-input,
-    .form-select,
-    .form-textarea {
+    .form-input {
       width: 100%;
       padding: 0.75rem 1rem;
       border: 1px solid var(--outline-variant);
       border-radius: var(--radius-sm);
       background: var(--surface-low);
-      color: var(--on-surface);
       font-family: 'Inter', sans-serif;
-      transition: border-color var(--transition);
     }
-
-    .form-input:focus,
-    .form-select:focus,
-    .form-textarea:focus {
+    .form-input:focus {
       outline: none;
       border-color: var(--primary);
     }
-
-    .form-textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    /* --- Visibility Options --- */
-    .visibility-options {
-      display: flex;
-      gap: 1rem;
-      margin-top: 0.5rem;
-    }
-
-    .visibility-option {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem;
-      background: var(--surface-low);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: all var(--transition);
-    }
-
-    .visibility-option.selected {
-      background: rgba(123, 84, 0, 0.1);
-      border: 1px solid var(--primary);
-    }
-
-    /* --- Auth Tabs --- */
-    .auth-tabs {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      border-bottom: 1px solid var(--surface-container);
-    }
-
-    .auth-tab {
-      padding: 0.75rem 1.5rem;
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      color: var(--on-surface-variant);
-      transition: all var(--transition);
-    }
-
-    .auth-tab.active {
-      color: var(--primary);
-      border-bottom: 2px solid var(--primary);
-    }
-
     .auth-error {
       background: rgba(176, 37, 0, 0.1);
-      color: var(--error);
+      color: #b02500;
       padding: 0.75rem;
       border-radius: var(--radius-sm);
       margin-bottom: 1rem;
       font-size: 0.875rem;
     }
-
-    /* --- Profile --- */
-    .profile-page { padding-top: 5rem; }
-    .profile-name { font-family: 'Manrope', sans-serif; font-size: 1.5rem; font-weight: 800; }
-    .profile-email { color: var(--on-surface-variant); }
-
-    /* --- User Menu --- */
-    .user-menu {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
+    .user-menu { display: flex; align-items: center; gap: 1rem; }
     .user-avatar {
       width: 2.5rem;
       height: 2.5rem;
@@ -568,62 +408,42 @@
       cursor: pointer;
     }
 
-    /* --- Responsive --- */
     @media (max-width: 768px) {
-      .nav-links {
-        display: none;
-      }
-      
-      .courses-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .hero-inner {
-        text-align: center;
-      }
+      .nav-links { display: none; }
+      .courses-grid { grid-template-columns: 1fr; }
     }
 
-    /* --- Animations --- */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     .page { animation: fadeIn 250ms ease; }
   </style>
 </head>
 <body>
 
-<!-- TOP NAVIGATION -->
-<nav class="top-nav glass-nav">
+<!-- NAVIGATION -->
+<nav class="glass-nav">
   <div class="nav-inner">
-    <a class="nav-brand" onclick="showPage('landing')">
-      <span class="nav-brand-icon eureka-gradient">
-        <span class="material-symbols-outlined">lightbulb</span>
-      </span>
+    <div class="nav-brand" onclick="showPage('landing')">
+      <span class="nav-brand-icon"><span class="material-symbols-outlined" style="color: #382400;">lightbulb</span></span>
       Эврика
-    </a>
-    
-    <div class="nav-links">
-      <button class="nav-link" data-page="landing" onclick="showPage('landing')">Главная</button>
-      <button class="nav-link" data-page="courses" onclick="showPage('courses')">Курсы</button>
     </div>
-    
+    <div class="nav-links">
+      <button class="nav-link" onclick="showPage('landing')">Главная</button>
+      <button class="nav-link" onclick="showPage('courses')">Курсы</button>
+    </div>
     <div class="nav-actions">
       <div class="lang-toggle">
-        <button class="lang-btn active" data-lang="ru">RU</button>
-        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn active">RU</button>
+        <button class="lang-btn">EN</button>
       </div>
-      <button class="icon-btn dark-mode-btn" onclick="toggleDarkMode()">
+      <button class="icon-btn" onclick="toggleDarkMode()">
         <span class="material-symbols-outlined">dark_mode</span>
       </button>
-      
-      <!-- Контейнер для авторизации -->
       <div id="auth-container" style="display: flex; gap: 0.5rem;">
         <button id="auth-trigger-btn" class="btn-secondary">Войти</button>
       </div>
-      
-      <!-- Меню пользователя (скрыто по умолчанию) -->
       <div id="user-menu" class="user-menu" style="display: none;">
         <div class="user-avatar" id="user-avatar"></div>
         <span id="user-name"></span>
@@ -635,21 +455,14 @@
   </div>
 </nav>
 
-<!-- Модальное окно авторизации -->
+<!-- AUTH MODAL -->
 <div id="auth-modal" class="modal-overlay">
   <div class="modal">
     <div class="modal-header">
       <h2 class="modal-title">Добро пожаловать</h2>
-      <button class="modal-close">&times;</button>
+      <button class="modal-close" onclick="closeAuthModal()">&times;</button>
     </div>
-    
-    <div class="auth-tabs">
-      <button class="auth-tab active" data-tab="login">Вход</button>
-      <button class="auth-tab" data-tab="register">Регистрация</button>
-    </div>
-    
-    <div id="auth-error" class="auth-error"></div>
-    
+    <div id="auth-error" class="auth-error" style="display: none;"></div>
     <div id="login-form">
       <div class="form-group">
         <label class="form-label">Email</label>
@@ -660,8 +473,10 @@
         <input type="password" id="login-password" class="form-input" placeholder="••••••">
       </div>
       <button id="login-submit" class="btn-primary" style="width: 100%;">Войти</button>
+      <p style="text-align: center; margin-top: 1rem;">
+        <button onclick="showRegisterForm()" style="background: none; border: none; color: var(--primary); cursor: pointer;">Нет аккаунта? Зарегистрироваться</button>
+      </p>
     </div>
-    
     <div id="register-form" style="display: none;">
       <div class="form-group">
         <label class="form-label">Имя</label>
@@ -676,135 +491,78 @@
         <input type="password" id="register-password" class="form-input" placeholder="минимум 6 символов">
       </div>
       <button id="register-submit" class="btn-primary" style="width: 100%;">Зарегистрироваться</button>
+      <p style="text-align: center; margin-top: 1rem;">
+        <button onclick="showLoginForm()" style="background: none; border: none; color: var(--primary); cursor: pointer;">Уже есть аккаунт? Войти</button>
+      </p>
     </div>
   </div>
 </div>
 
-<!-- Модальное окно создания курса -->
-<div id="create-course-modal" class="modal-overlay">
-  <div class="modal">
-    <div class="modal-header">
-      <h2 class="modal-title">Создать курс</h2>
-      <button class="modal-close" onclick="closeCreateCourseModal()">&times;</button>
-    </div>
-    
-    <div class="form-group">
-      <label class="form-label">Название курса</label>
-      <input type="text" id="course-title" class="form-input" placeholder="Введите название">
-    </div>
-    
-    <div class="form-group">
-      <label class="form-label">Описание</label>
-      <textarea id="course-description" class="form-textarea" placeholder="Расскажите о курсе"></textarea>
-    </div>
-    
-    <div class="form-group">
-      <label class="form-label">Иконка (эмодзи)</label>
-      <input type="text" id="course-icon" class="form-input" placeholder="📚" maxlength="2">
-    </div>
-    
-    <div class="form-group">
-      <label class="form-label">Уровень сложности</label>
-      <select id="course-level" class="form-select">
-        <option value="Начинающий">Начинающий</option>
-        <option value="Средний">Средний</option>
-        <option value="Продвинутый">Продвинутый</option>
-      </select>
-    </div>
-    
-    <div class="form-group">
-      <label class="form-label">Видимость</label>
-      <input type="hidden" id="course-visibility" value="public">
-      <div class="visibility-options">
-        <div class="visibility-option selected" data-value="public" onclick="setVisibility('public')">
-          <span class="material-symbols-outlined">public</span>
-          <span>Для всех</span>
-        </div>
-        <div class="visibility-option" data-value="link" onclick="setVisibility('link')">
-          <span class="material-symbols-outlined">link</span>
-          <span>По ссылке</span>
-        </div>
-        <div class="visibility-option" data-value="private" onclick="setVisibility('private')">
-          <span class="material-symbols-outlined">lock</span>
-          <span>Только я</span>
-        </div>
-      </div>
-    </div>
-    
-    <button id="create-course-submit" class="btn-primary" style="width: 100%;">Создать курс</button>
-  </div>
-</div>
-
-<!-- СТРАНИЦЫ -->
-
-<!-- Лендинг -->
+<!-- LANDING PAGE -->
 <div id="page-landing" class="page active">
   <div class="landing-wrap">
     <section class="hero">
       <div class="hero-inner">
-        <div class="hero-content">
-          <h1 class="hero-title">Учись Java бесплатно в интерактивной игровой системе</h1>
-          <p class="hero-subtitle">Осваивай программирование, создавай свои тесты и делись знаниями с другими.</p>
-          <div class="hero-actions">
-            <button class="btn-primary lg" onclick="showPage('courses')">Начать обучение</button>
-          </div>
+        <h1 class="hero-title">Учись Java бесплатно в интерактивной игровой системе</h1>
+        <p class="hero-subtitle">Осваивай программирование, создавай свои тесты и делись знаниями с другими.</p>
+        <div class="hero-actions">
+          <button class="btn-primary lg" onclick="showPage('courses')">Начать обучение</button>
         </div>
       </div>
     </section>
   </div>
 </div>
 
-<!-- Курсы -->
+<!-- COURSES PAGE -->
 <div id="page-courses" class="page">
   <div class="courses-page">
     <div class="section-inner">
       <div class="flex justify-between items-center mb-8">
         <h1 class="section-title">Курсы программирования</h1>
-        <button id="create-course-btn" class="btn-primary">
-          <span class="material-symbols-outlined">add</span>
-          Создать курс
+        <button class="btn-primary" onclick="alert('Создание курсов будет доступно позже')">
+          <span class="material-symbols-outlined">add</span> Создать курс
         </button>
       </div>
-      <div id="courses-container" class="courses-grid">
-        <!-- Курс Java будет добавлен через JavaScript -->
-      </div>
+      <div id="courses-container" class="courses-grid"></div>
     </div>
   </div>
 </div>
 
-<!-- Детали курса -->
+<!-- COURSE DETAIL PAGE -->
 <div id="page-course-detail" class="page">
   <div class="courses-page">
     <div class="section-inner" id="course-detail-container"></div>
   </div>
 </div>
 
-<!-- Детали урока -->
+<!-- LESSON DETAIL PAGE -->
 <div id="page-lesson-detail" class="page">
   <div class="courses-page">
     <div class="section-inner" id="lesson-detail-container"></div>
   </div>
 </div>
 
-<!-- Профиль -->
-<div id="page-profile" class="page">
-  <div class="profile-page">
-    <div class="section-inner" id="profile-content"></div>
-  </div>
-</div>
-
 <script>
-  // ============================================
-  // ПРОСТАЯ ВЕРСИЯ ДЛЯ ТЕСТИРОВАНИЯ ДИЗАЙНА
-  // ============================================
-  
-  // Состояние
+  // ========== FIREBASE КОНФИГУРАЦИЯ ==========
+  const firebaseConfig = {
+    apiKey: "AIzaSyC2ueIcLC3KHOtLN7tG7vdfMM2Sv1sYmSk",
+    authDomain: "evrika-e2af7.firebaseapp.com",
+    projectId: "evrika-e2af7",
+    storageBucket: "evrika-e2af7.firebasestorage.app",
+    messagingSenderId: "1004614194292",
+    appId: "1:1004614194292:web:221347a165714b58512d21",
+    measurementId: "G-6TK4JLZXL8"
+  };
+
+  // Инициализация Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // ========== ДАННЫЕ ==========
   let currentUser = null;
-  let currentCourse = null;
-  let currentLesson = null;
   
-  // Демо-курс
-  const demoCourse = {
+  const course = {
     id: 'java-basic',
     title: 'Java с нуля до профессионала',
     description: 'Полный курс по Java с нуля до уверенного уровня. 18 уроков, практические задания.',
@@ -814,195 +572,239 @@
     level: 'Начинающий',
     author: 'Эврика'
   };
-  
-  // Уроки
-  const javaLessons = [
-    { id: 1, title: 'Введение в Java', duration: '2 часа', order: 1 },
-    { id: 2, title: 'Переменные и примитивные типы', duration: '2 часа', order: 2 },
-    { id: 3, title: 'Операторы в Java', duration: '2 часа', order: 3 },
-    { id: 4, title: 'Условные операторы и циклы', duration: '2 часа', order: 4 },
-    { id: 5, title: 'Массивы', duration: '2 часа', order: 5 },
-    { id: 6, title: 'Строки (String, StringBuilder)', duration: '2 часа', order: 6 },
-    { id: 7, title: 'Методы', duration: '2 часа', order: 7 },
-    { id: 8, title: 'Классы, объекты и конструкторы', duration: '2 часа', order: 8 },
-    { id: 9, title: 'Наследование и полиморфизм', duration: '2 часа', order: 9 },
-    { id: 10, title: 'Абстрактные классы и интерфейсы', duration: '2 часа', order: 10 },
-    { id: 11, title: 'Исключения', duration: '2 часа', order: 11 },
-    { id: 12, title: 'Generics (Обобщения)', duration: '2 часа', order: 12 },
-    { id: 13, title: 'Коллекции', duration: '2 часа', order: 13 },
-    { id: 14, title: 'Stream API и лямбды', duration: '2 часа', order: 14 },
-    { id: 15, title: 'Многопоточность', duration: '2 часа', order: 15 },
-    { id: 16, title: 'Работа с датой и временем', duration: '2 часа', order: 16 },
-    { id: 17, title: 'Ввод-вывод (I/O и NIO)', duration: '2 часа', order: 17 },
-    { id: 18, title: 'Аннотации и рефлексия', duration: '2 часа', order: 18 }
+
+  const lessons = [
+    { id: 1, title: 'Введение в Java', duration: '2 часа', content: '<h1>Введение в Java</h1><p>Java — это объектно-ориентированный язык программирования, разработанный компанией Sun Microsystems. Он был создан Джеймсом Гослингом и впервые выпущен в 1995 году.</p><h2>Ключевые особенности Java:</h2><ul><li>Платформонезависимость (Write Once, Run Anywhere)</li><li>Объектно-ориентированный подход</li><li>Автоматическое управление памятью (Garbage Collection)</li><li>Богатая стандартная библиотека</li></ul>' },
+    { id: 2, title: 'Переменные и примитивные типы', duration: '2 часа', content: '<h1>Переменные и примитивные типы данных</h1><p>В Java существует 8 примитивных типов данных: byte, short, int, long, float, double, char, boolean.</p><h2>Примеры:</h2><pre style="background:#1e1e2e; padding:1rem; border-radius:0.5rem; overflow-x:auto;"><code>int age = 25;\ndouble price = 19.99;\nchar grade = \'A\';\nboolean isActive = true;</code></pre>' }
   ];
   
-  // Функция показа страниц
-  window.showPage = function(pageId) {
-    document.querySelectorAll('.page').forEach(page => {
-      page.classList.remove('active');
-    });
-    
-    const targetPage = document.getElementById(`page-${pageId}`);
-    if (targetPage) {
-      targetPage.classList.add('active');
-    }
-    
-    if (pageId === 'courses') {
-      renderCourses();
-    } else if (pageId === 'course-detail' && currentCourse) {
-      renderCourseDetail();
-    }
-    
+  for (let i = 3; i <= 18; i++) {
+    lessons.push({ id: i, title: `Урок ${i}: Продвинутые темы Java`, duration: '2 часа', content: `<h1>Урок ${i}</h1><p>Изучайте Java и становитесь профессионалом!</p>` });
+  }
+
+  // ========== ФУНКЦИИ ==========
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(`page-${pageId}`).classList.add('active');
+    if (pageId === 'courses') renderCourses();
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-  
-  // Рендер курсов
+  }
+
   function renderCourses() {
     const container = document.getElementById('courses-container');
     if (!container) return;
-    
     container.innerHTML = `
-      <div class="course-card" onclick="selectCourse('${demoCourse.id}')">
+      <div class="course-card" onclick="selectCourse()">
         <div class="course-card-header">
-          <div class="course-card-header-icon">${demoCourse.icon}</div>
-          <h3 class="course-card-title">${demoCourse.title}</h3>
-          <p class="course-card-meta">${demoCourse.level} • ${demoCourse.duration}</p>
+          <div class="course-card-header-icon">${course.icon}</div>
+          <h3 class="course-card-title">${course.title}</h3>
+          <p class="course-card-meta">${course.level} • ${course.duration}</p>
         </div>
         <div class="course-card-body">
-          <p class="course-card-description">${demoCourse.description}</p>
+          <p class="course-card-description">${course.description}</p>
           <div class="course-card-stats">
-            <span>📖 ${demoCourse.lessons} уроков</span>
-            <span>👤 ${demoCourse.author}</span>
+            <span>📖 ${course.lessons} уроков</span>
+            <span>👤 ${course.author}</span>
           </div>
         </div>
       </div>
     `;
   }
-  
-  // Выбор курса
-  window.selectCourse = function(courseId) {
-    currentCourse = demoCourse;
-    showPage('course-detail');
-    renderCourseDetail();
-  };
-  
-  // Рендер деталей курса
-  function renderCourseDetail() {
+
+  window.selectCourse = function() {
     const container = document.getElementById('course-detail-container');
-    if (!container || !currentCourse) return;
-    
     container.innerHTML = `
-      <div class="mb-8">
-        <button class="btn-secondary" onclick="showPage('courses')">← Назад к курсам</button>
-      </div>
-      <div class="course-detail-header" style="margin-bottom: 2rem;">
-        <div style="font-size: 4rem;">${currentCourse.icon}</div>
-        <h1 class="section-title" style="margin-top: 1rem;">${currentCourse.title}</h1>
-        <p class="section-subtitle">${currentCourse.description}</p>
+      <div class="mb-4"><button class="btn-secondary" onclick="showPage('courses')">← Назад к курсам</button></div>
+      <div style="margin-bottom: 2rem;">
+        <div style="font-size: 4rem;">${course.icon}</div>
+        <h1 class="section-title" style="margin-top: 1rem;">${course.title}</h1>
+        <p style="color: var(--on-surface-variant);">${course.description}</p>
         <div style="display: flex; gap: 2rem; margin-top: 1rem;">
-          <span>📖 ${currentCourse.lessons} уроков</span>
-          <span>⏱️ ${currentCourse.duration}</span>
-          <span>📊 ${currentCourse.level}</span>
+          <span>📖 ${course.lessons} уроков</span>
+          <span>⏱️ ${course.duration}</span>
+          <span>📊 ${course.level}</span>
         </div>
       </div>
-      
-      <h2 class="settings-section-title" style="font-size: 0.875rem; font-weight: 700; margin-bottom: 1rem;">Уроки курса</h2>
-      <div class="lessons-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
-        ${javaLessons.map((lesson, index) => `
-          <div class="lesson-item" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--surface-low); border-radius: var(--radius-sm); cursor: pointer;" onclick="startLesson(${lesson.id})">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-              <div style="width: 2rem; height: 2rem; border-radius: 50%; background: var(--surface-container); display: flex; align-items: center; justify-content: center; font-weight: 700;">${index + 1}</div>
+      <h2 style="font-family: Manrope; font-size: 0.875rem; font-weight: 700; margin-bottom: 1rem;">Уроки курса (18 уроков по 2 часа)</h2>
+      <div class="lessons-list">
+        ${lessons.map((lesson, idx) => `
+          <div class="lesson-item" onclick="startLesson(${lesson.id})">
+            <div class="lesson-left">
+              <div class="lesson-number">${idx + 1}</div>
               <div>
-                <div style="font-weight: 600;">${lesson.title}</div>
-                <div style="font-size: 0.75rem; color: var(--on-surface-variant);">${lesson.duration}</div>
+                <div class="lesson-title">${lesson.title}</div>
+                <div class="lesson-duration">${lesson.duration}</div>
               </div>
             </div>
-            <div style="font-size: 0.75rem;">▶ Начать</div>
+            <span class="material-symbols-outlined" style="color: var(--primary);">arrow_forward</span>
           </div>
         `).join('')}
       </div>
     `;
-  }
-  
-  // Запуск урока
+    showPage('course-detail');
+  };
+
   window.startLesson = function(lessonId) {
-    const lesson = javaLessons.find(l => l.id === lessonId);
+    const lesson = lessons.find(l => l.id === lessonId);
     if (!lesson) return;
-    currentLesson = lesson;
-    
     const container = document.getElementById('lesson-detail-container');
-    if (!container) return;
-    
     container.innerHTML = `
-      <div class="mb-4">
-        <button class="btn-secondary" onclick="showPage('course-detail')">← Назад к курсу</button>
-      </div>
-      <div class="lesson-header">
-        <h1 class="lesson-title" style="font-family: 'Manrope', sans-serif; font-size: 2rem; font-weight: 800;">${lesson.title}</h1>
-        <div class="lesson-meta">Длительность: ${lesson.duration}</div>
-      </div>
-      <div style="background: var(--surface-lowest); border-radius: var(--radius-sm); padding: 2rem; margin-top: 1rem;">
-        <h2>Содержание урока</h2>
-        <p>Этот урок познакомит вас с основами Java программирования.</p>
-        <p>В ходе урока вы изучите ключевые концепции и получите практические навыки.</p>
-        <h3>Ключевые темы:</h3>
-        <ul>
-          <li>Основные понятия и терминология</li>
-          <li>Практические примеры кода</li>
-          <li>Типичные ошибки и их решение</li>
-        </ul>
-        <p>После завершения урока вы сможете перейти к следующему.</p>
-      </div>
-      <div style="margin-top: 2rem;">
-        <button class="btn-primary" onclick="showPage('course-detail')">Завершить урок</button>
+      <div class="mb-4"><button class="btn-secondary" onclick="selectCourse()">← Назад к курсу</button></div>
+      <div class="lesson-content">${lesson.content}</div>
+      <div style="margin-top: 2rem; text-align: center;">
+        <button class="btn-primary" onclick="selectCourse()">✓ Завершить урок</button>
       </div>
     `;
-    
     showPage('lesson-detail');
   };
-  
-  // Открытие модального окна
-  window.openCreateCourseModal = function() {
-    document.getElementById('create-course-modal').classList.add('active');
-  };
-  
-  window.closeCreateCourseModal = function() {
-    document.getElementById('create-course-modal').classList.remove('active');
-  };
-  
-  window.setVisibility = function(value) {
-    document.querySelectorAll('.visibility-option').forEach(opt => {
-      opt.classList.toggle('selected', opt.dataset.value === value);
-    });
-    document.getElementById('course-visibility').value = value;
-  };
-  
-  // Темная тема
+
   window.toggleDarkMode = function() {
     document.documentElement.classList.toggle('dark');
   };
-  
-  // Модальные окна
-  document.querySelectorAll('.modal-close, .modal-overlay').forEach(el => {
-    el.addEventListener('click', function(e) {
-      if (e.target === this) {
-        this.classList.remove('active');
-      }
-    });
-  });
-  
-  // Авторизация (простая демо)
-  const authModal = document.getElementById('auth-modal');
-  const authTriggerBtn = document.getElementById('auth-trigger-btn');
-  
-  if (authTriggerBtn) {
-    authTriggerBtn.addEventListener('click', () => authModal.classList.add('active'));
+
+  // ========== АВТОРИЗАЦИЯ ==========
+  function showError(message) {
+    const errorDiv = document.getElementById('auth-error');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+    setTimeout(() => errorDiv.style.display = 'none', 3000);
   }
-  
+
+  function showLoginForm() {
+    document.getElementById('login-form').style.display = 'block';
+    document.getElementById('register-form').style.display = 'none';
+  }
+
+  function showRegisterForm() {
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('register-form').style.display = 'block';
+  }
+
+  function openAuthModal() {
+    document.getElementById('auth-modal').classList.add('active');
+    showLoginForm();
+  }
+
+  function closeAuthModal() {
+    document.getElementById('auth-modal').classList.remove('active');
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-password').value = '';
+    document.getElementById('register-name').value = '';
+    document.getElementById('register-email').value = '';
+    document.getElementById('register-password').value = '';
+  }
+
+  async function login() {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    
+    if (!email || !password) {
+      showError('Заполните все поля');
+      return;
+    }
+    
+    try {
+      const userCredential = await auth.signInWithEmailAndPassword(email, password);
+      console.log('Успешный вход:', userCredential.user.email);
+      closeAuthModal();
+    } catch (error) {
+      console.error('Ошибка входа:', error);
+      if (error.code === 'auth/user-not-found') showError('Пользователь не найден');
+      else if (error.code === 'auth/wrong-password') showError('Неверный пароль');
+      else if (error.code === 'auth/invalid-email') showError('Неверный email');
+      else showError('Ошибка: ' + error.message);
+    }
+  }
+
+  async function register() {
+    const name = document.getElementById('register-name').value;
+    const email = document.getElementById('register-email').value;
+    const password = document.getElementById('register-password').value;
+    
+    if (!name || !email || !password) {
+      showError('Заполните все поля');
+      return;
+    }
+    if (password.length < 6) {
+      showError('Пароль должен быть не менее 6 символов');
+      return;
+    }
+    
+    try {
+      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+      await userCredential.user.updateProfile({ displayName: name });
+      
+      // Сохраняем данные пользователя в Firestore
+      await db.collection('users').doc(userCredential.user.uid).set({
+        name: name,
+        email: email,
+        createdAt: new Date()
+      });
+      
+      console.log('Успешная регистрация:', userCredential.user.email);
+      closeAuthModal();
+    } catch (error) {
+      console.error('Ошибка регистрации:', error);
+      if (error.code === 'auth/email-already-in-use') showError('Email уже используется');
+      else if (error.code === 'auth/weak-password') showError('Слишком слабый пароль');
+      else showError('Ошибка: ' + error.message);
+    }
+  }
+
+  async function logout() {
+    try {
+      await auth.signOut();
+      console.log('Выход выполнен');
+    } catch (error) {
+      console.error('Ошибка выхода:', error);
+    }
+  }
+
+  function updateUIForUser(user) {
+    const authContainer = document.getElementById('auth-container');
+    const userMenu = document.getElementById('user-menu');
+    const userName = document.getElementById('user-name');
+    const userAvatar = document.getElementById('user-avatar');
+    
+    if (user) {
+      const displayName = user.displayName || user.email.split('@')[0];
+      userName.textContent = displayName;
+      userAvatar.textContent = displayName.charAt(0).toUpperCase();
+      authContainer.style.display = 'none';
+      userMenu.style.display = 'flex';
+    } else {
+      authContainer.style.display = 'flex';
+      userMenu.style.display = 'none';
+    }
+  }
+
+  // Слушатель состояния авторизации
+  auth.onAuthStateChanged((user) => {
+    currentUser = user;
+    updateUIForUser(user);
+  });
+
+  // Обработчики событий
+  document.getElementById('auth-trigger-btn')?.addEventListener('click', openAuthModal);
+  document.getElementById('login-submit')?.addEventListener('click', login);
+  document.getElementById('register-submit')?.addEventListener('click', register);
+  document.querySelectorAll('.modal-close').forEach(btn => {
+    btn.addEventListener('click', closeAuthModal);
+  });
+  document.getElementById('auth-modal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('auth-modal')) closeAuthModal();
+  });
+
   // Инициализация
   renderCourses();
-  showPage('landing');
+  window.showPage = showPage;
+  window.selectCourse = selectCourse;
+  window.startLesson = startLesson;
+  window.toggleDarkMode = toggleDarkMode;
+  window.logout = logout;
+  window.showLoginForm = showLoginForm;
+  window.showRegisterForm = showRegisterForm;
+  window.closeAuthModal = closeAuthModal;
 </script>
 
 </body>
