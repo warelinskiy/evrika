@@ -4,70 +4,87 @@
 
 let currentUser = null;
 
-// Элементы
-const authModal = document.getElementById('auth-modal');
-const authTriggerBtn = document.getElementById('auth-trigger-btn');
-const loginBtn = document.getElementById('login-btn');
-const userMenu = document.getElementById('user-menu');
-const authContainer = document.getElementById('auth-container');
+function showError(message) {
+  const errorDiv = document.getElementById('auth-error');
+  if (errorDiv) {
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+    setTimeout(() => errorDiv.style.display = 'none', 3000);
+  }
+}
 
-// Функция открытия модального окна авторизации
+function showLoginForm() {
+  const loginForm = document.getElementById('login-form');
+  const registerForm = document.getElementById('register-form');
+  if (loginForm) loginForm.style.display = 'block';
+  if (registerForm) registerForm.style.display = 'none';
+}
+
+function showRegisterForm() {
+  const loginForm = document.getElementById('login-form');
+  const registerForm = document.getElementById('register-form');
+  if (loginForm) loginForm.style.display = 'none';
+  if (registerForm) registerForm.style.display = 'block';
+}
+
 function openAuthModal() {
-  authModal.classList.add('active');
+  const modal = document.getElementById('auth-modal');
+  if (modal) {
+    modal.classList.add('active');
+    showLoginForm();
+  }
 }
 
 function closeAuthModal() {
-  authModal.classList.remove('active');
-  document.getElementById('auth-error').textContent = '';
-  document.getElementById('login-email').value = '';
-  document.getElementById('login-password').value = '';
-  document.getElementById('register-name').value = '';
-  document.getElementById('register-email').value = '';
-  document.getElementById('register-password').value = '';
+  const modal = document.getElementById('auth-modal');
+  if (modal) {
+    modal.classList.remove('active');
+    const inputs = modal.querySelectorAll('input');
+    inputs.forEach(input => input.value = '');
+  }
 }
 
-// Переключение табов
-function switchAuthTab(tab) {
-  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-  document.querySelector(`.auth-tab[data-tab="${tab}"]`).classList.add('active');
+async function login() {
+  const email = document.getElementById('login-email')?.value;
+  const password = document.getElementById('login-password')?.value;
   
-  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
-  document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
-}
-
-// Вход в систему
-async function login(email, password) {
+  if (!email || !password) {
+    showError('Заполните все поля');
+    return;
+  }
+  
   try {
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     currentUser = userCredential.user;
     updateUIForLoggedInUser(currentUser);
     closeAuthModal();
-    return { success: true };
   } catch (error) {
-    let errorMessage = 'Ошибка входа';
-    switch (error.code) {
-      case 'auth/user-not-found':
-        errorMessage = 'Пользователь не найден';
-        break;
-      case 'auth/wrong-password':
-        errorMessage = 'Неверный пароль';
-        break;
-      case 'auth/invalid-email':
-        errorMessage = 'Неверный формат email';
-        break;
-    }
-    document.getElementById('auth-error').textContent = errorMessage;
-    return { success: false, error: errorMessage };
+    console.error('Ошибка входа:', error);
+    if (error.code === 'auth/user-not-found') showError('Пользователь не найден');
+    else if (error.code === 'auth/wrong-password') showError('Неверный пароль');
+    else if (error.code === 'auth/invalid-email') showError('Неверный email');
+    else showError('Ошибка: ' + error.message);
   }
 }
 
-// Регистрация
-async function register(name, email, password) {
+async function register() {
+  const name = document.getElementById('register-name')?.value;
+  const email = document.getElementById('register-email')?.value;
+  const password = document.getElementById('register-password')?.value;
+  
+  if (!name || !email || !password) {
+    showError('Заполните все поля');
+    return;
+  }
+  if (password.length < 6) {
+    showError('Пароль должен быть не менее 6 символов');
+    return;
+  }
+  
   try {
     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-    // Обновляем профиль с именем
     await userCredential.user.updateProfile({ displayName: name });
-    // Сохраняем дополнительную информацию в Firestore
+    
     await db.collection('users').doc(userCredential.user.uid).set({
       name: name,
       email: email,
@@ -75,29 +92,18 @@ async function register(name, email, password) {
       completedLessons: [],
       courseProgress: {}
     });
+    
     currentUser = userCredential.user;
     updateUIForLoggedInUser(currentUser);
     closeAuthModal();
-    return { success: true };
   } catch (error) {
-    let errorMessage = 'Ошибка регистрации';
-    switch (error.code) {
-      case 'auth/email-already-in-use':
-        errorMessage = 'Email уже используется';
-        break;
-      case 'auth/weak-password':
-        errorMessage = 'Пароль слишком слабый (минимум 6 символов)';
-        break;
-      case 'auth/invalid-email':
-        errorMessage = 'Неверный формат email';
-        break;
-    }
-    document.getElementById('auth-error').textContent = errorMessage;
-    return { success: false, error: errorMessage };
+    console.error('Ошибка регистрации:', error);
+    if (error.code === 'auth/email-already-in-use') showError('Email уже используется');
+    else if (error.code === 'auth/weak-password') showError('Слишком слабый пароль');
+    else showError('Ошибка: ' + error.message);
   }
 }
 
-// Выход из системы
 async function logout() {
   try {
     await auth.signOut();
@@ -109,43 +115,36 @@ async function logout() {
   }
 }
 
-// Обновление UI для залогиненного пользователя
 function updateUIForLoggedInUser(user) {
-  const displayName = user.displayName || user.email.split('@')[0];
-  const initial = displayName.charAt(0).toUpperCase();
+  const authContainer = document.getElementById('auth-container');
+  const userMenu = document.getElementById('user-menu');
+  const userName = document.getElementById('user-name');
+  const userAvatar = document.getElementById('user-avatar');
   
-  document.getElementById('user-avatar').textContent = initial;
-  document.getElementById('user-name').textContent = displayName;
-  
-  authContainer.style.display = 'none';
-  userMenu.style.display = 'flex';
-  
-  // Загружаем прогресс пользователя
-  loadUserProgress();
+  if (user) {
+    const displayName = user.displayName || user.email.split('@')[0];
+    if (userName) userName.textContent = displayName;
+    if (userAvatar) userAvatar.textContent = displayName.charAt(0).toUpperCase();
+    if (authContainer) authContainer.style.display = 'none';
+    if (userMenu) userMenu.style.display = 'flex';
+    loadUserProgress();
+  }
 }
 
-// Обновление UI для разлогиненного пользователя
 function updateUIForLoggedOutUser() {
-  authContainer.style.display = 'flex';
-  userMenu.style.display = 'none';
-  
-  // Очищаем данные пользователя
-  currentUser = null;
+  const authContainer = document.getElementById('auth-container');
+  const userMenu = document.getElementById('user-menu');
+  if (authContainer) authContainer.style.display = 'flex';
+  if (userMenu) userMenu.style.display = 'none';
+  window.userProgress = null;
 }
 
-// Загрузка прогресса пользователя
 async function loadUserProgress() {
   if (!currentUser) return;
-  
   try {
     const userDoc = await db.collection('users').doc(currentUser.uid).get();
     if (userDoc.exists) {
-      const userData = userDoc.data();
-      window.userProgress = {
-        completedLessons: userData.completedLessons || [],
-        courseProgress: userData.courseProgress || {}
-      };
-      // Обновляем отображение прогресса
+      window.userProgress = userDoc.data();
       updateProgressDisplay();
     }
   } catch (error) {
@@ -153,10 +152,8 @@ async function loadUserProgress() {
   }
 }
 
-// Сохранение прогресса
 async function saveProgress(courseId, lessonId) {
   if (!currentUser) return;
-  
   try {
     const userRef = db.collection('users').doc(currentUser.uid);
     const userDoc = await userRef.get();
@@ -166,11 +163,9 @@ async function saveProgress(courseId, lessonId) {
       completedLessons.push(lessonId);
       await userRef.update({
         completedLessons: completedLessons,
-        [`courseProgress.${courseId}`]: {
-          completedLessons: completedLessons.filter(l => l.startsWith(courseId)).length
-        }
+        [`courseProgress.${courseId}`]: completedLessons.filter(l => l.startsWith(courseId)).length
       });
-      window.userProgress = { completedLessons, courseProgress: {} };
+      if (window.userProgress) window.userProgress.completedLessons = completedLessons;
       updateProgressDisplay();
     }
   } catch (error) {
@@ -178,12 +173,9 @@ async function saveProgress(courseId, lessonId) {
   }
 }
 
-// Обновление отображения прогресса
 function updateProgressDisplay() {
-  if (!window.userProgress) return;
-  
-  const completedCount = window.userProgress.completedLessons?.length || 0;
-  const totalLessons = 18; // Всего уроков в курсе Java
+  const completedCount = window.userProgress?.completedLessons?.length || 0;
+  const totalLessons = 18;
   const percentage = Math.round((completedCount / totalLessons) * 100);
   
   const progressFill = document.querySelector('.progress-bar-fill');
@@ -196,42 +188,30 @@ function updateProgressDisplay() {
 }
 
 // Инициализация слушателя авторизации
-function initAuth() {
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      currentUser = user;
-      updateUIForLoggedInUser(user);
-    } else {
-      currentUser = null;
-      updateUIForLoggedOutUser();
-    }
-  });
-  
-  // Обработчики событий
-  if (authTriggerBtn) {
-    authTriggerBtn.addEventListener('click', openAuthModal);
+auth.onAuthStateChanged((user) => {
+  currentUser = user;
+  if (user) {
+    updateUIForLoggedInUser(user);
+  } else {
+    updateUIForLoggedOutUser();
   }
+});
+
+// Обработчики событий
+document.addEventListener('DOMContentLoaded', () => {
+  const authTriggerBtn = document.getElementById('auth-trigger-btn');
+  if (authTriggerBtn) authTriggerBtn.addEventListener('click', openAuthModal);
   
-  document.querySelectorAll('.modal-close, .modal-overlay').forEach(el => {
-    el.addEventListener('click', closeAuthModal);
-  });
+  const loginSubmit = document.getElementById('login-submit');
+  if (loginSubmit) loginSubmit.addEventListener('click', login);
   
-  document.querySelectorAll('.auth-tab').forEach(tab => {
-    tab.addEventListener('click', () => switchAuthTab(tab.dataset.tab));
-  });
+  const registerSubmit = document.getElementById('register-submit');
+  if (registerSubmit) registerSubmit.addEventListener('click', register);
   
-  document.getElementById('login-submit')?.addEventListener('click', async () => {
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-    await login(email, password);
-  });
-  
-  document.getElementById('register-submit')?.addEventListener('click', async () => {
-    const name = document.getElementById('register-name').value;
-    const email = document.getElementById('register-email').value;
-    const password = document.getElementById('register-password').value;
-    await register(name, email, password);
-  });
-  
-  document.getElementById('logout-btn')?.addEventListener('click', logout);
-}
+  const modal = document.getElementById('auth-modal');
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeAuthModal();
+    });
+  }
+});
