@@ -19,7 +19,7 @@
 <nav class="glass-nav">
   <div class="nav-inner">
     <div class="nav-brand" onclick="showPage('landing')">
-      <div class="nav-brand-icon"><span class="material-symbols-outlined" style="color: #382400;">lightbulb</span></div>
+      <div class="nav-brand-icon"><span class="material-symbols-outlined" style="color:#382400;">lightbulb</span></div>
       <span>Эврика</span>
     </div>
     <div class="nav-links">
@@ -27,11 +27,25 @@
       <button class="nav-link" onclick="showPage('profile')">Профиль</button>
     </div>
     <div class="nav-actions">
+      <div class="theme-toggle">
+        <button class="icon-btn theme-trigger-btn"><span class="material-symbols-outlined">palette</span></button>
+        <div class="theme-dropdown">
+          <div class="theme-option" data-theme="light" onclick="setTheme('light')">☀️ Светлая</div>
+          <div class="theme-option" data-theme="dark" onclick="setTheme('dark')">🌙 Тёмная</div>
+          <div class="theme-option" data-theme="sunset" onclick="setTheme('sunset')">🌅 Закат</div>
+          <div class="theme-option" data-theme="ocean" onclick="setTheme('ocean')">🌊 Океан</div>
+          <div class="theme-option" data-theme="lavender" onclick="setTheme('lavender')">💜 Лаванда</div>
+        </div>
+      </div>
+      <div class="lang-toggle">
+        <button class="lang-btn active" data-lang="ru" onclick="setLanguage('ru')">RU</button>
+        <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">EN</button>
+      </div>
       <div id="auth-container"><button class="btn-secondary" id="auth-trigger-btn">Войти</button></div>
-      <div id="user-menu" class="user-menu" style="display: none;">
+      <div id="user-menu" class="user-menu" style="display:none;">
         <div class="user-avatar" id="user-avatar"></div>
         <span id="user-name"></span>
-        <button class="icon-btn" onclick="logout()">🚪</button>
+        <button class="icon-btn" onclick="logout()"><span class="material-symbols-outlined">logout</span></button>
       </div>
     </div>
   </div>
@@ -44,7 +58,7 @@
       <h2 class="modal-title">Добро пожаловать</h2>
       <button class="modal-close" onclick="closeAuthModal()">&times;</button>
     </div>
-    <div id="auth-error" class="auth-error" style="display: none;"></div>
+    <div id="auth-error" class="auth-error" style="display:none;"></div>
     
     <div id="login-form">
       <div class="form-group"><label class="form-label">Email или Username</label><input type="text" id="login-username" class="form-input"></div>
@@ -65,77 +79,69 @@
   </div>
 </div>
 
-<!-- ГЛАВНАЯ СТРАНИЦА -->
+<!-- ГЛАВНАЯ СТРАНИЦА (8 БЛОКОВ) -->
 <div id="page-landing" class="page active">
   <div class="landing-wrap">
     
-    <!-- БЛОК 1 -->
     <section class="hero-section">
       <div class="hero-container">
         <div class="hero-content">
           <div class="hero-badge"><span class="hero-badge-dot"></span><span>Онлайн платформа обучения</span></div>
           <h1 class="hero-title">Учись Java бесплатно в интерактивной игровой системе</h1>
           <p class="hero-description">Осваивай программирование, создавай свои тесты и делись знаниями с другими.</p>
-          <div class="hero-buttons"><button class="btn-primary" onclick="showPage('profile')">Начать обучение</button><button class="btn-secondary" onclick="openAuthModal()">У меня уже есть аккаунт</button></div>
+          <div class="hero-buttons"><button class="btn-primary lg" onclick="showPage('profile')">Начать обучение</button><button class="btn-secondary lg" onclick="openAuthModal()">У меня уже есть аккаунт</button></div>
           <div class="hero-stats"><div class="hero-stat"><span class="hero-stat-value">50K+</span><span class="hero-stat-label">Активных студентов</span></div><div class="hero-stat"><span class="hero-stat-value">98%</span><span class="hero-stat-label">Успешных выпускников</span></div><div class="hero-stat"><span class="hero-stat-value">24/7</span><span class="hero-stat-label">Поддержка</span></div></div>
         </div>
-        <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">terminal</span></div></div></div>
+        <div class="hero-visual"><div class="hero-visual-glow"></div><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">terminal</span></div></div></div>
       </div>
     </section>
 
-    <!-- БЛОК 2 -->
     <section class="hero-section alt">
       <div class="hero-container reverse">
         <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">payments</span></div></div></div>
-        <div class="hero-content"><h2 class="hero-title-small">Создавай и зарабатывай</h2><p class="hero-description">Публикуйте свои тесты и получайте вознаграждение за качественный контент.</p><div class="hero-feature-card"><span class="material-symbols-outlined">payments</span><div><strong>Монетизируйте знания</strong><br>Зарабатывайте баллы за популярные курсы</div></div></div>
+        <div class="hero-content"><h2 class="hero-title-small">Создавай и зарабатывай</h2><p class="hero-description">Наша платформа позволяет не только учиться, но и становиться автором. Публикуйте свои тесты и получайте вознаграждение.</p><div class="hero-feature-card"><span class="material-symbols-outlined hero-feature-icon">payments</span><div><h4>Монетизируйте свои знания</h4><p>Зарабатывайте баллы и бонусы за популярные курсы</p></div></div></div>
       </div>
     </section>
 
-    <!-- БЛОК 3 -->
     <section class="hero-section">
       <div class="hero-container">
-        <div class="hero-content"><h2 class="hero-title-small">Научный подход к обучению</h2><p class="hero-description">Алгоритмы интервальных повторений для максимального усвоения.</p><div class="hero-stats-grid"><div class="hero-stat-compact"><span class="hero-stat-value">90%</span><br>Усвоение</div><div class="hero-stat-compact"><span class="hero-stat-value">3x</span><br>Быстрее</div><div class="hero-stat-compact"><span class="hero-stat-value">24/7</span><br>Доступно</div></div></div>
+        <div class="hero-content"><h2 class="hero-title-small">Научный подход к обучению</h2><p class="hero-description">В основе Eureka лежат алгоритмы интервальных повторений и когнитивной психологии.</p><div class="hero-stats-grid"><div class="hero-stat-compact"><span class="hero-stat-value">90%</span><br>Усвоение</div><div class="hero-stat-compact"><span class="hero-stat-value">3x</span><br>Быстрее</div><div class="hero-stat-compact"><span class="hero-stat-value">24/7</span><br>Доступно</div></div></div>
         <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">psychology</span></div></div></div>
       </div>
     </section>
 
-    <!-- БЛОК 4 -->
     <section class="hero-section alt">
       <div class="hero-container reverse">
         <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">school</span></div></div></div>
-        <div class="hero-content"><h2 class="hero-title-small">Как проходит обучение</h2><div class="process-steps"><div class="process-step"><div class="step-number">1</div><div><strong>Учись</strong><br>Короткие уроки без воды</div></div><div class="process-step"><div class="step-number">2</div><div><strong>Тестируй</strong><br>Интерактивные тесты</div></div><div class="process-step"><div class="step-number">3</div><div><strong>Практикуй</strong><br>Живые задачи</div></div></div></div>
+        <div class="hero-content"><h2 class="hero-title-small">Как проходит обучение</h2><div class="process-steps"><div class="process-step"><div class="step-number">1</div><div><h4>Учись</h4><p>Короткие и емкие уроки без воды</p></div></div><div class="process-step"><div class="step-number">2</div><div><h4>Тестируй</h4><p>Интерактивные тесты в реальном времени</p></div></div><div class="process-step"><div class="step-number">3</div><div><h4>Практикуй</h4><p>Решение живых задач по кодингу</p></div></div></div></div>
       </div>
     </section>
 
-    <!-- БЛОК 5 -->
     <section class="hero-section">
       <div class="hero-container">
-        <div class="hero-content"><h2 class="hero-title-small">Глубокое понимание вместо заучивания</h2><p class="hero-description">Программирование — это логика, а не синтаксис.</p><button class="btn-primary" onclick="showPage('profile')">Начать погружение</button></div>
+        <div class="hero-content"><h2 class="hero-title-small">Глубокое понимание вместо заучивания</h2><p class="hero-description">Мы верим, что программирование — это логика, а не синтаксис.</p><button class="btn-primary" onclick="showPage('profile')">Начать глубокое погружение</button></div>
         <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">architecture</span></div></div></div>
       </div>
     </section>
 
-    <!-- БЛОК 6 -->
     <section class="hero-section alt">
       <div class="hero-container reverse">
         <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">schedule</span></div></div></div>
-        <div class="hero-content"><h2 class="hero-title-small">Обучение без давления</h2><p class="hero-description">Учитесь в своем темпе 24/7. Никаких дедлайнов.</p><div class="features-grid-compact"><div class="feature-compact"><span class="material-symbols-outlined">schedule</span> Свободный график</div><div class="feature-compact"><span class="material-symbols-outlined">devices</span> Любое устройство</div><div class="feature-compact"><span class="material-symbols-outlined">trending_up</span> Свой темп</div><div class="feature-compact"><span class="material-symbols-outlined">psychology</span> Без дедлайнов</div></div></div>
+        <div class="hero-content"><h2 class="hero-title-small">Обучение без давления</h2><p class="hero-description">Никаких обязательных вебинаров или расписаний. Учитесь в своем темпе 24/7.</p><div class="features-grid-compact"><div class="feature-compact"><span class="material-symbols-outlined">schedule</span><span>Свободный график</span></div><div class="feature-compact"><span class="material-symbols-outlined">devices</span><span>Любое устройство</span></div><div class="feature-compact"><span class="material-symbols-outlined">trending_up</span><span>Свой темп</span></div><div class="feature-compact"><span class="material-symbols-outlined">psychology</span><span>Без дедлайнов</span></div></div></div>
       </div>
     </section>
 
-    <!-- БЛОК 7 -->
     <section class="hero-section">
       <div class="hero-container">
-        <div class="hero-content"><h2 class="hero-title-small">Что говорят студенты</h2><div class="testimonial-card"><div class="testimonial-avatar">👨‍💻</div><div><em>"Лучший курс по Java!"</em><br>— Алексей</div></div><div class="testimonial-card"><div class="testimonial-avatar">👩‍💻</div><div><em>"Удобная платформа, рекомендую!"</em><br>— Мария</div></div></div>
+        <div class="hero-content"><h2 class="hero-title-small">Что говорят наши студенты</h2><div class="testimonial-card"><div class="testimonial-avatar">👨‍💻</div><div class="testimonial-content"><p class="testimonial-text">"Лучший курс по Java! За 3 месяца с нуля до Junior разработчика."</p><p class="testimonial-author">— Алексей Иванов</p></div></div><div class="testimonial-card"><div class="testimonial-avatar">👩‍💻</div><div class="testimonial-content"><p class="testimonial-text">"Удобная платформа, понятные уроки и отличные тесты. Рекомендую!"</p><p class="testimonial-author">— Мария Соколова</p></div></div></div>
         <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">star_rate</span></div></div></div>
       </div>
     </section>
 
-    <!-- БЛОК 8 CTA -->
     <section class="hero-section alt cta-section">
       <div class="hero-container reverse">
         <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">rocket_launch</span></div></div></div>
-        <div class="hero-content"><h2 class="hero-title-large">Готов начать путь в IT?</h2><p class="hero-description">Присоединяйся к тысячам студентов</p><button class="btn-primary" onclick="showPage('profile')">Начать бесплатно</button></div>
+        <div class="hero-content"><h2 class="hero-title-large">Готов начать свой путь в IT?</h2><p class="hero-description">Присоединяйся к тысячам студентов, которые уже учатся на платформе Эврика</p><div class="hero-buttons"><button class="btn-primary lg" onclick="showPage('profile')">Начать бесплатно</button></div></div>
       </div>
     </section>
 
@@ -145,11 +151,38 @@
 <!-- ПРОФИЛЬ -->
 <div id="page-profile" class="page">
   <div class="profile-page">
-    <div class="section-inner" id="profile-container"></div>
+    <div class="profile-inner" id="profile-container"></div>
   </div>
 </div>
 
-<!-- СКРИПТЫ -->
+<!-- МОБИЛЬНАЯ НАВИГАЦИЯ -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <button class="mobile-nav-btn" onclick="showPage('landing')"><span class="material-symbols-outlined">home</span><span>Главная</span></button>
+    <button class="mobile-nav-btn" onclick="showPage('profile')"><span class="material-symbols-outlined">account_circle</span><span>Профиль</span></button>
+  </div>
+</nav>
+
+<script>
+  // Функции для тем
+  window.setTheme = function(theme) {
+    document.body.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  };
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) document.body.setAttribute('data-theme', savedTheme);
+  
+  // Функции для языка (упрощенно)
+  window.setLanguage = function(lang) {
+    localStorage.setItem('language', lang);
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+  };
+  const savedLang = localStorage.getItem('language');
+  if (savedLang) setLanguage(savedLang);
+</script>
+
 <script src="js/firebase-config.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/profile.js"></script>
