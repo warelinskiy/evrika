@@ -14,7 +14,5 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Настройка persistence
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-
-console.log('🔥 Firebase инициализирован');
+console.log('🔥 Firebase готов');
