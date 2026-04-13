@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Эврика | Платформа обучения Java</title>
+  <title>Эврика | Java Mastery Platform</title>
   
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&family=Material+Symbols+Outlined" rel="stylesheet">
@@ -13,437 +13,41 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   
-  <style>
-    /* ========== ПОЛНЫЙ ДИЗАЙН ========== */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --surface: #f6f6fd;
-      --surface-low: #f0f0f8;
-      --surface-container: #e7e8f0;
-      --surface-high: #e1e2eb;
-      --surface-highest: #dbdce6;
-      --surface-lowest: #ffffff;
-      --on-surface: #2d2f34;
-      --on-surface-variant: #5a5b61;
-      --outline-variant: #acadb3;
-      --primary: #7b5400;
-      --primary-fixed: #feb300;
-      --primary-fixed-dim: #eda600;
-      --on-primary-fixed: #382400;
-      --gradient-start: #FFD54F;
-      --gradient-end: #FFB300;
-      --transition: 200ms ease-out;
-      --radius-sm: 1rem;
-      --radius-lg: 2rem;
-      --radius-full: 9999px;
-    }
-
-    .dark {
-      --surface: #13141a;
-      --surface-low: #1a1b23;
-      --surface-container: #1f2029;
-      --surface-high: #24252f;
-      --surface-highest: #2a2b36;
-      --surface-lowest: #0e0f14;
-      --on-surface: #e4e5ec;
-      --on-surface-variant: #a8abb6;
-      --outline-variant: #44475a;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--surface);
-      color: var(--on-surface);
-      margin: 0;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* Navigation */
-    .glass-nav {
-      background: rgba(246, 246, 253, 0.72);
-      backdrop-filter: blur(20px);
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 50;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-    .dark .glass-nav { background: rgba(19, 20, 26, 0.72); }
-
-    .nav-inner {
-      max-width: 1600px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-    }
-
-    .nav-brand {
-      font-family: 'Manrope', sans-serif;
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: var(--on-surface);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .nav-brand-icon {
-      width: 2rem;
-      height: 2rem;
-      border-radius: 0.625rem;
-      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-      font-family: 'Manrope', sans-serif;
-      font-weight: 600;
-    }
-
-    .nav-link {
-      color: var(--on-surface-variant);
-      cursor: pointer;
-      background: none;
-      border: none;
-      font-size: 0.875rem;
-      transition: color var(--transition);
-    }
-    .nav-link:hover { color: var(--primary-fixed-dim); }
-
-    .nav-actions { display: flex; align-items: center; gap: 1rem; }
-
-    .icon-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--on-surface-variant);
-      padding: 0.25rem;
-      border-radius: var(--radius-sm);
-    }
-    .icon-btn:hover { color: var(--primary-fixed-dim); }
-
-    .lang-toggle {
-      display: flex;
-      background: var(--surface-low);
-      border-radius: var(--radius-full);
-      padding: 0.2rem;
-    }
-    .lang-btn {
-      padding: 0.3rem 0.9rem;
-      border-radius: var(--radius-full);
-      border: none;
-      font-size: 0.75rem;
-      font-weight: 700;
-      cursor: pointer;
-      background: transparent;
-      color: var(--on-surface-variant);
-    }
-    .lang-btn.active {
-      background: var(--surface-lowest);
-      color: var(--on-surface);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-      color: var(--on-primary-fixed);
-      border: none;
-      border-radius: var(--radius-full);
-      padding: 0.6rem 1.5rem;
-      font-family: 'Manrope', sans-serif;
-      font-weight: 700;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: transform var(--transition);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .btn-primary:hover { transform: scale(1.02); }
-    .btn-primary.lg { padding: 1rem 2.5rem; font-size: 1.0625rem; }
-
-    .btn-secondary {
-      background: var(--surface-high);
-      color: var(--on-surface);
-      border: none;
-      border-radius: var(--radius-full);
-      padding: 0.6rem 1.5rem;
-      font-family: 'Manrope', sans-serif;
-      font-weight: 700;
-      font-size: 0.875rem;
-      cursor: pointer;
-    }
-    .btn-secondary:hover { background: var(--surface-highest); }
-
-    /* Pages */
-    .page { display: none; }
-    .page.active { display: block; }
-
-    /* Hero */
-    .landing-wrap { padding-top: 5rem; }
-    .hero { padding: 5rem 0 4rem; }
-    .hero-inner {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 0 2rem;
-      text-align: center;
-    }
-    .hero-title {
-      font-family: 'Manrope', sans-serif;
-      font-size: clamp(2.5rem, 5vw, 4.5rem);
-      font-weight: 800;
-      line-height: 1.1;
-      color: var(--on-surface);
-      margin-bottom: 1.5rem;
-    }
-    .hero-subtitle {
-      font-size: 1.125rem;
-      color: var(--on-surface-variant);
-      line-height: 1.7;
-      max-width: 40rem;
-      margin: 0 auto 2rem;
-    }
-    .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-
-    /* Courses */
-    .courses-page { padding-top: 5rem; min-height: 100vh; }
-    .section-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
-    .section-title {
-      font-family: 'Manrope', sans-serif;
-      font-size: clamp(1.75rem, 3vw, 2.5rem);
-      font-weight: 800;
-      color: var(--on-surface);
-      margin-bottom: 1rem;
-    }
-    .flex { display: flex; }
-    .justify-between { justify-content: space-between; }
-    .items-center { align-items: center; }
-    .mb-8 { margin-bottom: 2rem; }
-    .mb-4 { margin-bottom: 1rem; }
-    .mt-2 { margin-top: 0.5rem; }
-
-    .courses-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 2rem;
-      margin-top: 2rem;
-    }
-
-    .course-card {
-      background: var(--surface-lowest);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      border: 1px solid rgba(172, 173, 179, 0.08);
-      transition: transform var(--transition), box-shadow var(--transition);
-      cursor: pointer;
-    }
-    .course-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
-    }
-    .course-card-header {
-      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-      padding: 2rem;
-      text-align: center;
-    }
-    .course-card-header-icon { font-size: 3rem; }
-    .course-card-title {
-      font-family: 'Manrope', sans-serif;
-      font-size: 1.25rem;
-      font-weight: 800;
-      margin: 1rem 0 0.5rem;
-      color: var(--on-primary-fixed);
-    }
-    .course-card-meta { font-size: 0.75rem; color: rgba(56, 36, 0, 0.8); }
-    .course-card-body { padding: 1.5rem; }
-    .course-card-description {
-      font-size: 0.875rem;
-      color: var(--on-surface-variant);
-      line-height: 1.6;
-      margin-bottom: 1rem;
-    }
-    .course-card-stats { display: flex; gap: 1rem; font-size: 0.75rem; color: var(--on-surface-variant); }
-
-    /* Lessons */
-    .lessons-list { display: flex; flex-direction: column; gap: 0.75rem; }
-    .lesson-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem;
-      background: var(--surface-low);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: background var(--transition);
-    }
-    .lesson-item:hover { background: var(--surface-container); }
-    .lesson-left { display: flex; align-items: center; gap: 1rem; }
-    .lesson-number {
-      width: 2rem;
-      height: 2rem;
-      border-radius: 50%;
-      background: var(--surface-container);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-    }
-    .lesson-title { font-weight: 600; }
-    .lesson-duration { font-size: 0.75rem; color: var(--on-surface-variant); }
-
-    /* Lesson Content */
-    .lesson-content {
-      background: var(--surface-lowest);
-      border-radius: var(--radius-sm);
-      padding: 2rem;
-    }
-    .lesson-content h1 {
-      font-family: 'Manrope', sans-serif;
-      font-size: 1.75rem;
-      font-weight: 800;
-      margin-bottom: 1rem;
-    }
-    .lesson-content h2 {
-      font-family: 'Manrope', sans-serif;
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin: 1.5rem 0 1rem;
-    }
-    .lesson-content p { line-height: 1.7; margin-bottom: 1rem; color: var(--on-surface-variant); }
-    .lesson-content ul { margin: 1rem 0; padding-left: 1.5rem; }
-    .lesson-content li { margin: 0.5rem 0; }
-
-    /* Modals */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(4px);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: all var(--transition);
-    }
-    .modal-overlay.active { opacity: 1; visibility: visible; }
-    .modal {
-      background: var(--surface-lowest);
-      border-radius: var(--radius-lg);
-      max-width: 450px;
-      width: 90%;
-      padding: 2rem;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-    }
-    .modal-title {
-      font-family: 'Manrope', sans-serif;
-      font-size: 1.5rem;
-      font-weight: 800;
-    }
-    .modal-close {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--on-surface-variant);
-    }
-    .form-group { margin-bottom: 1.25rem; }
-    .form-label {
-      display: block;
-      font-size: 0.875rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-    .form-input {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1px solid var(--outline-variant);
-      border-radius: var(--radius-sm);
-      background: var(--surface-low);
-      font-family: 'Inter', sans-serif;
-    }
-    .form-input:focus {
-      outline: none;
-      border-color: var(--primary);
-    }
-    .auth-error {
-      background: rgba(176, 37, 0, 0.1);
-      color: #b02500;
-      padding: 0.75rem;
-      border-radius: var(--radius-sm);
-      margin-bottom: 1rem;
-      font-size: 0.875rem;
-    }
-    .user-menu { display: flex; align-items: center; gap: 1rem; }
-    .user-avatar {
-      width: 2.5rem;
-      height: 2.5rem;
-      border-radius: 50%;
-      background: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    @media (max-width: 768px) {
-      .nav-links { display: none; }
-      .courses-grid { grid-template-columns: 1fr; }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .page { animation: fadeIn 250ms ease; }
-  </style>
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-<!-- NAVIGATION -->
-<nav class="glass-nav">
+<!-- TOP NAVIGATION -->
+<nav class="top-nav glass-nav">
   <div class="nav-inner">
     <div class="nav-brand" onclick="showPage('landing')">
-      <span class="nav-brand-icon"><span class="material-symbols-outlined" style="color: #382400;">lightbulb</span></span>
-      Эврика
+      <div class="nav-brand-icon eureka-gradient">
+        <span class="material-symbols-outlined">lightbulb</span>
+      </div>
+      <span>Эврика</span>
     </div>
+    
     <div class="nav-links">
-      <button class="nav-link" onclick="showPage('landing')">Главная</button>
-      <button class="nav-link" onclick="showPage('courses')">Курсы</button>
+      <button class="nav-link" data-page="landing" onclick="showPage('landing')">Главная</button>
+      <button class="nav-link" data-page="courses" onclick="showPage('courses')">Курсы</button>
+      <button class="nav-link" data-page="community" onclick="showPage('community')">Сообщество</button>
+      <button class="nav-link" data-page="pricing" onclick="showPage('pricing')">Цены</button>
     </div>
+    
     <div class="nav-actions">
       <div class="lang-toggle">
-        <button class="lang-btn active">RU</button>
-        <button class="lang-btn">EN</button>
+        <button class="lang-btn" data-lang="ru" onclick="setLanguage('ru')">RU</button>
+        <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">EN</button>
       </div>
-      <button class="icon-btn" onclick="toggleDarkMode()">
+      <button class="icon-btn dark-mode-btn" onclick="toggleDarkMode()">
         <span class="material-symbols-outlined">dark_mode</span>
       </button>
+      
       <div id="auth-container" style="display: flex; gap: 0.5rem;">
-        <button id="auth-trigger-btn" class="btn-secondary">Войти</button>
+        <button id="auth-trigger-btn" class="btn-secondary" data-t="nav_login">Войти</button>
       </div>
+      
       <div id="user-menu" class="user-menu" style="display: none;">
         <div class="user-avatar" id="user-avatar"></div>
         <span id="user-name"></span>
@@ -459,54 +63,113 @@
 <div id="auth-modal" class="modal-overlay">
   <div class="modal">
     <div class="modal-header">
-      <h2 class="modal-title">Добро пожаловать</h2>
+      <h2 class="modal-title" data-t="welcome">Добро пожаловать</h2>
       <button class="modal-close" onclick="closeAuthModal()">&times;</button>
     </div>
     <div id="auth-error" class="auth-error" style="display: none;"></div>
+    
     <div id="login-form">
       <div class="form-group">
-        <label class="form-label">Email</label>
+        <label class="form-label" data-t="email">Email</label>
         <input type="email" id="login-email" class="form-input" placeholder="example@mail.com">
       </div>
       <div class="form-group">
-        <label class="form-label">Пароль</label>
+        <label class="form-label" data-t="password">Пароль</label>
         <input type="password" id="login-password" class="form-input" placeholder="••••••">
       </div>
-      <button id="login-submit" class="btn-primary" style="width: 100%;">Войти</button>
+      <button id="login-submit" class="btn-primary" style="width: 100%;" data-t="login_btn">Войти</button>
       <p style="text-align: center; margin-top: 1rem;">
-        <button onclick="showRegisterForm()" style="background: none; border: none; color: var(--primary); cursor: pointer;">Нет аккаунта? Зарегистрироваться</button>
+        <button onclick="showRegisterForm()" style="background: none; border: none; color: var(--primary); cursor: pointer;" data-t="no_account">Нет аккаунта? Зарегистрироваться</button>
       </p>
     </div>
+    
     <div id="register-form" style="display: none;">
       <div class="form-group">
-        <label class="form-label">Имя</label>
+        <label class="form-label" data-t="name">Имя</label>
         <input type="text" id="register-name" class="form-input" placeholder="Ваше имя">
       </div>
       <div class="form-group">
-        <label class="form-label">Email</label>
+        <label class="form-label" data-t="email">Email</label>
         <input type="email" id="register-email" class="form-input" placeholder="example@mail.com">
       </div>
       <div class="form-group">
-        <label class="form-label">Пароль</label>
+        <label class="form-label" data-t="password">Пароль</label>
         <input type="password" id="register-password" class="form-input" placeholder="минимум 6 символов">
       </div>
-      <button id="register-submit" class="btn-primary" style="width: 100%;">Зарегистрироваться</button>
+      <button id="register-submit" class="btn-primary" style="width: 100%;" data-t="register_btn">Зарегистрироваться</button>
       <p style="text-align: center; margin-top: 1rem;">
-        <button onclick="showLoginForm()" style="background: none; border: none; color: var(--primary); cursor: pointer;">Уже есть аккаунт? Войти</button>
+        <button onclick="showLoginForm()" style="background: none; border: none; color: var(--primary); cursor: pointer;" data-t="has_account">Уже есть аккаунт? Войти</button>
       </p>
     </div>
   </div>
 </div>
+
+<!-- CREATE COURSE MODAL -->
+<div id="create-course-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" data-t="create_course">Создать курс</h2>
+      <button class="modal-close" onclick="closeCreateCourseModal()">&times;</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-t="course_title">Название курса</label>
+      <input type="text" id="course-title" class="form-input" placeholder="Введите название">
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-t="course_desc">Описание</label>
+      <textarea id="course-description" class="form-textarea" placeholder="Расскажите о курсе"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-t="course_icon">Иконка (эмодзи)</label>
+      <input type="text" id="course-icon" class="form-input" placeholder="📚" maxlength="2">
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-t="course_level">Уровень сложности</label>
+      <select id="course-level" class="form-select">
+        <option value="Начинающий" data-t="beginner">Начинающий</option>
+        <option value="Средний" data-t="intermediate">Средний</option>
+        <option value="Продвинутый" data-t="advanced">Продвинутый</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-t="visibility">Видимость</label>
+      <input type="hidden" id="course-visibility" value="public">
+      <div class="visibility-options">
+        <div class="visibility-option selected" data-value="public" onclick="setVisibility('public')">
+          <span class="material-symbols-outlined">public</span>
+          <span data-t="public_btn">Для всех</span>
+        </div>
+        <div class="visibility-option" data-value="link" onclick="setVisibility('link')">
+          <span class="material-symbols-outlined">link</span>
+          <span data-t="link_btn">По ссылке</span>
+        </div>
+        <div class="visibility-option" data-value="private" onclick="setVisibility('private')">
+          <span class="material-symbols-outlined">lock</span>
+          <span data-t="private_btn">Только я</span>
+        </div>
+      </div>
+    </div>
+    <button id="create-course-submit" class="btn-primary" style="width: 100%;" data-t="create_btn">Создать курс</button>
+  </div>
+</div>
+
+<!-- PAGES -->
 
 <!-- LANDING PAGE -->
 <div id="page-landing" class="page active">
   <div class="landing-wrap">
     <section class="hero">
       <div class="hero-inner">
-        <h1 class="hero-title">Учись Java бесплатно в интерактивной игровой системе</h1>
-        <p class="hero-subtitle">Осваивай программирование, создавай свои тесты и делись знаниями с другими.</p>
-        <div class="hero-actions">
-          <button class="btn-primary lg" onclick="showPage('courses')">Начать обучение</button>
+        <div class="hero-content">
+          <div class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            <span data-t="hero_badge">Онлайн платформа обучения</span>
+          </div>
+          <h1 class="hero-title" data-t="hero_title">Учись Java бесплатно в интерактивной игровой системе</h1>
+          <p class="hero-subtitle" data-t="hero_subtitle">Осваивай программирование, создавай свои тесты и делись знаниями с другими.</p>
+          <div class="hero-actions">
+            <button class="btn-primary lg" onclick="showPage('courses')" data-t="hero_cta">Начать обучение</button>
+          </div>
         </div>
       </div>
     </section>
@@ -518,12 +181,51 @@
   <div class="courses-page">
     <div class="section-inner">
       <div class="flex justify-between items-center mb-8">
-        <h1 class="section-title">Курсы программирования</h1>
-        <button class="btn-primary" onclick="alert('Создание курсов будет доступно позже')">
-          <span class="material-symbols-outlined">add</span> Создать курс
+        <h1 class="section-title" data-t="courses_title">Курсы программирования</h1>
+        <button id="create-course-btn" class="btn-primary">
+          <span class="material-symbols-outlined">add</span>
+          <span data-t="create_course_btn">Создать курс</span>
         </button>
       </div>
       <div id="courses-container" class="courses-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- COMMUNITY PAGE -->
+<div id="page-community" class="page">
+  <div class="courses-page">
+    <div class="section-inner">
+      <h1 class="section-title" data-t="community_title">Сообщество</h1>
+      <p class="section-subtitle" data-t="community_subtitle">Общайтесь с другими разработчиками, делитесь опытом и находите единомышленников</p>
+      <div class="community-placeholder" style="text-align: center; padding: 4rem;">
+        <span class="material-symbols-outlined" style="font-size: 4rem; color: var(--primary);">groups</span>
+        <p style="margin-top: 1rem;" data-t="community_soon">Скоро здесь появится сообщество</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING PAGE -->
+<div id="page-pricing" class="page">
+  <div class="courses-page">
+    <div class="section-inner">
+      <h1 class="section-title" data-t="pricing_title">Цены</h1>
+      <p class="section-subtitle" data-t="pricing_subtitle">Выберите подходящий тариф для обучения</p>
+      <div class="pricing-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
+        <div class="pricing-card" style="background: var(--surface-lowest); border-radius: var(--radius-sm); padding: 2rem; text-align: center;">
+          <h3 style="font-size: 1.5rem; font-weight: 800;" data-t="free">Бесплатный</h3>
+          <div style="font-size: 2.5rem; font-weight: 800; margin: 1rem 0;">0 ₽</div>
+          <p data-t="free_desc">Доступ ко всем базовым курсам</p>
+          <button class="btn-secondary" style="margin-top: 1.5rem;" data-t="current_plan">Текущий план</button>
+        </div>
+        <div class="pricing-card" style="background: var(--surface-lowest); border-radius: var(--radius-sm); padding: 2rem; text-align: center; border: 2px solid var(--primary);">
+          <h3 style="font-size: 1.5rem; font-weight: 800;" data-t="pro">Pro</h3>
+          <div style="font-size: 2.5rem; font-weight: 800; margin: 1rem 0;">990 ₽<span style="font-size: 1rem;">/мес</span></div>
+          <p data-t="pro_desc">Все курсы + сертификаты + поддержка</p>
+          <button class="btn-primary" style="margin-top: 1.5rem;" data-t="upgrade">Выбрать</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -542,270 +244,41 @@
   </div>
 </div>
 
-<script>
-  // ========== FIREBASE КОНФИГУРАЦИЯ ==========
-  const firebaseConfig = {
-    apiKey: "AIzaSyC2ueIcLC3KHOtLN7tG7vdfMM2Sv1sYmSk",
-    authDomain: "evrika-e2af7.firebaseapp.com",
-    projectId: "evrika-e2af7",
-    storageBucket: "evrika-e2af7.firebasestorage.app",
-    messagingSenderId: "1004614194292",
-    appId: "1:1004614194292:web:221347a165714b58512d21",
-    measurementId: "G-6TK4JLZXL8"
-  };
+<!-- PROFILE PAGE -->
+<div id="page-profile" class="page">
+  <div class="profile-page">
+    <div class="profile-inner" id="profile-container"></div>
+  </div>
+</div>
 
-  // Инициализация Firebase
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <button class="mobile-nav-btn" data-page="landing" onclick="showPage('landing')">
+      <span class="material-symbols-outlined">school</span>
+      <span data-t="mobile_learn">Обучение</span>
+    </button>
+    <button class="mobile-nav-btn" data-page="courses" onclick="showPage('courses')">
+      <span class="material-symbols-outlined">menu_book</span>
+      <span data-t="mobile_courses">Курсы</span>
+    </button>
+    <button class="mobile-nav-btn" data-page="community" onclick="showPage('community')">
+      <span class="material-symbols-outlined">groups</span>
+      <span data-t="mobile_community">Сообщество</span>
+    </button>
+    <button class="mobile-nav-btn" data-page="profile" onclick="showPage('profile')">
+      <span class="material-symbols-outlined">account_circle</span>
+      <span data-t="mobile_profile">Профиль</span>
+    </button>
+  </div>
+</nav>
 
-  // ========== ДАННЫЕ ==========
-  let currentUser = null;
-  
-  const course = {
-    id: 'java-basic',
-    title: 'Java с нуля до профессионала',
-    description: 'Полный курс по Java с нуля до уверенного уровня. 18 уроков, практические задания.',
-    icon: '💻',
-    lessons: 18,
-    duration: '36 часов',
-    level: 'Начинающий',
-    author: 'Эврика'
-  };
-
-  const lessons = [
-    { id: 1, title: 'Введение в Java', duration: '2 часа', content: '<h1>Введение в Java</h1><p>Java — это объектно-ориентированный язык программирования, разработанный компанией Sun Microsystems. Он был создан Джеймсом Гослингом и впервые выпущен в 1995 году.</p><h2>Ключевые особенности Java:</h2><ul><li>Платформонезависимость (Write Once, Run Anywhere)</li><li>Объектно-ориентированный подход</li><li>Автоматическое управление памятью (Garbage Collection)</li><li>Богатая стандартная библиотека</li></ul>' },
-    { id: 2, title: 'Переменные и примитивные типы', duration: '2 часа', content: '<h1>Переменные и примитивные типы данных</h1><p>В Java существует 8 примитивных типов данных: byte, short, int, long, float, double, char, boolean.</p><h2>Примеры:</h2><pre style="background:#1e1e2e; padding:1rem; border-radius:0.5rem; overflow-x:auto;"><code>int age = 25;\ndouble price = 19.99;\nchar grade = \'A\';\nboolean isActive = true;</code></pre>' }
-  ];
-  
-  for (let i = 3; i <= 18; i++) {
-    lessons.push({ id: i, title: `Урок ${i}: Продвинутые темы Java`, duration: '2 часа', content: `<h1>Урок ${i}</h1><p>Изучайте Java и становитесь профессионалом!</p>` });
-  }
-
-  // ========== ФУНКЦИИ ==========
-  function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(`page-${pageId}`).classList.add('active');
-    if (pageId === 'courses') renderCourses();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function renderCourses() {
-    const container = document.getElementById('courses-container');
-    if (!container) return;
-    container.innerHTML = `
-      <div class="course-card" onclick="selectCourse()">
-        <div class="course-card-header">
-          <div class="course-card-header-icon">${course.icon}</div>
-          <h3 class="course-card-title">${course.title}</h3>
-          <p class="course-card-meta">${course.level} • ${course.duration}</p>
-        </div>
-        <div class="course-card-body">
-          <p class="course-card-description">${course.description}</p>
-          <div class="course-card-stats">
-            <span>📖 ${course.lessons} уроков</span>
-            <span>👤 ${course.author}</span>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  window.selectCourse = function() {
-    const container = document.getElementById('course-detail-container');
-    container.innerHTML = `
-      <div class="mb-4"><button class="btn-secondary" onclick="showPage('courses')">← Назад к курсам</button></div>
-      <div style="margin-bottom: 2rem;">
-        <div style="font-size: 4rem;">${course.icon}</div>
-        <h1 class="section-title" style="margin-top: 1rem;">${course.title}</h1>
-        <p style="color: var(--on-surface-variant);">${course.description}</p>
-        <div style="display: flex; gap: 2rem; margin-top: 1rem;">
-          <span>📖 ${course.lessons} уроков</span>
-          <span>⏱️ ${course.duration}</span>
-          <span>📊 ${course.level}</span>
-        </div>
-      </div>
-      <h2 style="font-family: Manrope; font-size: 0.875rem; font-weight: 700; margin-bottom: 1rem;">Уроки курса (18 уроков по 2 часа)</h2>
-      <div class="lessons-list">
-        ${lessons.map((lesson, idx) => `
-          <div class="lesson-item" onclick="startLesson(${lesson.id})">
-            <div class="lesson-left">
-              <div class="lesson-number">${idx + 1}</div>
-              <div>
-                <div class="lesson-title">${lesson.title}</div>
-                <div class="lesson-duration">${lesson.duration}</div>
-              </div>
-            </div>
-            <span class="material-symbols-outlined" style="color: var(--primary);">arrow_forward</span>
-          </div>
-        `).join('')}
-      </div>
-    `;
-    showPage('course-detail');
-  };
-
-  window.startLesson = function(lessonId) {
-    const lesson = lessons.find(l => l.id === lessonId);
-    if (!lesson) return;
-    const container = document.getElementById('lesson-detail-container');
-    container.innerHTML = `
-      <div class="mb-4"><button class="btn-secondary" onclick="selectCourse()">← Назад к курсу</button></div>
-      <div class="lesson-content">${lesson.content}</div>
-      <div style="margin-top: 2rem; text-align: center;">
-        <button class="btn-primary" onclick="selectCourse()">✓ Завершить урок</button>
-      </div>
-    `;
-    showPage('lesson-detail');
-  };
-
-  window.toggleDarkMode = function() {
-    document.documentElement.classList.toggle('dark');
-  };
-
-  // ========== АВТОРИЗАЦИЯ ==========
-  function showError(message) {
-    const errorDiv = document.getElementById('auth-error');
-    errorDiv.textContent = message;
-    errorDiv.style.display = 'block';
-    setTimeout(() => errorDiv.style.display = 'none', 3000);
-  }
-
-  function showLoginForm() {
-    document.getElementById('login-form').style.display = 'block';
-    document.getElementById('register-form').style.display = 'none';
-  }
-
-  function showRegisterForm() {
-    document.getElementById('login-form').style.display = 'none';
-    document.getElementById('register-form').style.display = 'block';
-  }
-
-  function openAuthModal() {
-    document.getElementById('auth-modal').classList.add('active');
-    showLoginForm();
-  }
-
-  function closeAuthModal() {
-    document.getElementById('auth-modal').classList.remove('active');
-    document.getElementById('login-email').value = '';
-    document.getElementById('login-password').value = '';
-    document.getElementById('register-name').value = '';
-    document.getElementById('register-email').value = '';
-    document.getElementById('register-password').value = '';
-  }
-
-  async function login() {
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-    
-    if (!email || !password) {
-      showError('Заполните все поля');
-      return;
-    }
-    
-    try {
-      const userCredential = await auth.signInWithEmailAndPassword(email, password);
-      console.log('Успешный вход:', userCredential.user.email);
-      closeAuthModal();
-    } catch (error) {
-      console.error('Ошибка входа:', error);
-      if (error.code === 'auth/user-not-found') showError('Пользователь не найден');
-      else if (error.code === 'auth/wrong-password') showError('Неверный пароль');
-      else if (error.code === 'auth/invalid-email') showError('Неверный email');
-      else showError('Ошибка: ' + error.message);
-    }
-  }
-
-  async function register() {
-    const name = document.getElementById('register-name').value;
-    const email = document.getElementById('register-email').value;
-    const password = document.getElementById('register-password').value;
-    
-    if (!name || !email || !password) {
-      showError('Заполните все поля');
-      return;
-    }
-    if (password.length < 6) {
-      showError('Пароль должен быть не менее 6 символов');
-      return;
-    }
-    
-    try {
-      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-      await userCredential.user.updateProfile({ displayName: name });
-      
-      // Сохраняем данные пользователя в Firestore
-      await db.collection('users').doc(userCredential.user.uid).set({
-        name: name,
-        email: email,
-        createdAt: new Date()
-      });
-      
-      console.log('Успешная регистрация:', userCredential.user.email);
-      closeAuthModal();
-    } catch (error) {
-      console.error('Ошибка регистрации:', error);
-      if (error.code === 'auth/email-already-in-use') showError('Email уже используется');
-      else if (error.code === 'auth/weak-password') showError('Слишком слабый пароль');
-      else showError('Ошибка: ' + error.message);
-    }
-  }
-
-  async function logout() {
-    try {
-      await auth.signOut();
-      console.log('Выход выполнен');
-    } catch (error) {
-      console.error('Ошибка выхода:', error);
-    }
-  }
-
-  function updateUIForUser(user) {
-    const authContainer = document.getElementById('auth-container');
-    const userMenu = document.getElementById('user-menu');
-    const userName = document.getElementById('user-name');
-    const userAvatar = document.getElementById('user-avatar');
-    
-    if (user) {
-      const displayName = user.displayName || user.email.split('@')[0];
-      userName.textContent = displayName;
-      userAvatar.textContent = displayName.charAt(0).toUpperCase();
-      authContainer.style.display = 'none';
-      userMenu.style.display = 'flex';
-    } else {
-      authContainer.style.display = 'flex';
-      userMenu.style.display = 'none';
-    }
-  }
-
-  // Слушатель состояния авторизации
-  auth.onAuthStateChanged((user) => {
-    currentUser = user;
-    updateUIForUser(user);
-  });
-
-  // Обработчики событий
-  document.getElementById('auth-trigger-btn')?.addEventListener('click', openAuthModal);
-  document.getElementById('login-submit')?.addEventListener('click', login);
-  document.getElementById('register-submit')?.addEventListener('click', register);
-  document.querySelectorAll('.modal-close').forEach(btn => {
-    btn.addEventListener('click', closeAuthModal);
-  });
-  document.getElementById('auth-modal')?.addEventListener('click', (e) => {
-    if (e.target === document.getElementById('auth-modal')) closeAuthModal();
-  });
-
-  // Инициализация
-  renderCourses();
-  window.showPage = showPage;
-  window.selectCourse = selectCourse;
-  window.startLesson = startLesson;
-  window.toggleDarkMode = toggleDarkMode;
-  window.logout = logout;
-  window.showLoginForm = showLoginForm;
-  window.showRegisterForm = showRegisterForm;
-  window.closeAuthModal = closeAuthModal;
-</script>
+<!-- SCRIPTS -->
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/courses.js"></script>
+<script src="js/lessons.js"></script>
+<script src="js/app.js"></script>
 
 </body>
 </html>
