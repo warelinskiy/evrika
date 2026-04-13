@@ -1,5 +1,5 @@
 // ============================================
-// МОДУЛЬ ПРОФИЛЯ
+// МОДУЛЬ ПРОФИЛЯ (С РЕДАКТИРОВАНИЕМ)
 // ============================================
 
 window.renderProfilePage = async function() {
@@ -33,6 +33,7 @@ window.renderProfilePage = async function() {
   
   container.innerHTML = `
     <div class="profile-telegram">
+      <!-- Аватар -->
       <div class="profile-avatar-section">
         <div class="profile-avatar-large" onclick="openAvatarSelector()">
           ${data.avatar || '👤'}
@@ -40,6 +41,7 @@ window.renderProfilePage = async function() {
         </div>
       </div>
       
+      <!-- Основная информация -->
       <div class="profile-info-section">
         <div class="profile-field" onclick="editField('name')">
           <span class="profile-field-label">Имя</span>
@@ -64,12 +66,14 @@ window.renderProfilePage = async function() {
         </div>
       </div>
       
+      <!-- Статистика -->
       <div class="profile-stats-telegram">
         <div class="stat-item"><span class="stat-number">${completed}</span><span class="stat-label">уроков</span></div>
         <div class="stat-item"><span class="stat-number">${percentage}%</span><span class="stat-label">прогресс</span></div>
         <div class="stat-item"><span class="stat-number">${hours}</span><span class="stat-label">часов</span></div>
       </div>
       
+      <!-- Безопасность -->
       <div class="profile-section-title">Безопасность</div>
       <div class="profile-info-section">
         <div class="profile-field" onclick="editField('email')">
@@ -79,7 +83,7 @@ window.renderProfilePage = async function() {
             <span class="material-symbols-outlined">chevron_right</span>
           </div>
         </div>
-        <div class="profile-field" onclick="changePassword()">
+        <div class="profile-field" onclick="openPasswordModal()">
           <span class="profile-field-label">Пароль</span>
           <div class="profile-field-value">
             <span>••••••••</span>
@@ -88,6 +92,7 @@ window.renderProfilePage = async function() {
         </div>
       </div>
       
+      <!-- Информация об аккаунте -->
       <div class="profile-section-title">Информация</div>
       <div class="profile-info-section">
         <div class="profile-field">
@@ -104,6 +109,7 @@ window.renderProfilePage = async function() {
         </div>
       </div>
       
+      <!-- Действия -->
       <div class="profile-actions-telegram">
         <button class="profile-action-btn logout" onclick="logout()">
           <span class="material-symbols-outlined">logout</span> Выйти из аккаунта
@@ -116,6 +122,7 @@ window.renderProfilePage = async function() {
   `;
 };
 
+// ========== ВЫБОР АВАТАРА ==========
 window.openAvatarSelector = function() {
   const modal = document.getElementById('avatar-modal');
   if (!modal) return;
@@ -143,6 +150,7 @@ window.selectAvatarAndSave = async function(emoji) {
     if (typeof showNotification === 'function') showNotification('Аватар обновлен!', 'success');
   } catch(e) {
     console.error(e);
+    if (typeof showNotification === 'function') showNotification('Ошибка обновления аватара', 'error');
   }
 };
 
@@ -151,6 +159,7 @@ window.closeAvatarModal = function() {
   if (modal) modal.classList.remove('active');
 };
 
+// ========== РЕДАКТИРОВАНИЕ ПОЛЕЙ ==========
 window.editField = function(field) {
   const modal = document.getElementById('edit-field-modal');
   if (!modal) return;
@@ -158,24 +167,42 @@ window.editField = function(field) {
   const data = window.userData;
   let currentValue = '';
   let placeholder = '';
+  let inputType = 'text';
   
   switch(field) {
-    case 'name': currentValue = data.name || ''; placeholder = 'Ваше имя'; break;
-    case 'username': currentValue = data.username || ''; placeholder = 'username'; break;
-    case 'bio': currentValue = data.bio || ''; placeholder = 'Расскажите о себе...'; break;
-    case 'email': currentValue = data.email || ''; placeholder = 'Email'; break;
+    case 'name':
+      currentValue = data.name || '';
+      placeholder = 'Ваше имя';
+      break;
+    case 'username':
+      currentValue = data.username || '';
+      placeholder = 'username (только буквы, цифры, _)';
+      break;
+    case 'bio':
+      currentValue = data.bio || '';
+      placeholder = 'Расскажите о себе...';
+      break;
+    case 'email':
+      currentValue = data.email || '';
+      placeholder = 'Email';
+      inputType = 'email';
+      break;
   }
   
   const input = document.getElementById('edit-field-input');
   if (input) {
     input.value = currentValue;
     input.placeholder = placeholder;
+    input.type = inputType;
   }
+  
+  // Сохраняем текущее поле для обработчика
+  window.currentEditingField = field;
   
   const saveBtn = document.getElementById('save-field-btn');
   const newSaveBtn = saveBtn.cloneNode(true);
   saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
-  newSaveBtn.onclick = () => saveField(field);
+  newSaveBtn.onclick = () => saveField();
   
   modal.classList.add('active');
 };
@@ -183,15 +210,19 @@ window.editField = function(field) {
 window.closeEditFieldModal = function() {
   const modal = document.getElementById('edit-field-modal');
   if (modal) modal.classList.remove('active');
+  window.currentEditingField = null;
 };
 
-async function saveField(field) {
+async function saveField() {
+  const field = window.currentEditingField;
   const value = document.getElementById('edit-field-input')?.value.trim();
+  
   if (!value && field !== 'bio') {
     if (typeof showNotification === 'function') showNotification('Поле не может быть пустым', 'error');
     return;
   }
   
+  // Валидация username
   if (field === 'username') {
     if (!/^[a-zA-Z0-9_]{3,20}$/.test(value)) {
       if (typeof showNotification === 'function') showNotification('Username: 3-20 символов (буквы, цифры, _)', 'error');
@@ -203,11 +234,14 @@ async function saveField(field) {
         if (typeof showNotification === 'function') showNotification('Username уже занят', 'error');
         return;
       }
-    } catch(e) {}
+    } catch(e) {
+      console.error(e);
+    }
   }
   
+  // Валидация email
   if (field === 'email') {
-    if (!value.includes('@')) {
+    if (!value.includes('@') || !value.includes('.')) {
       if (typeof showNotification === 'function') showNotification('Введите корректный email', 'error');
       return;
     }
@@ -232,13 +266,22 @@ async function saveField(field) {
   }
 }
 
-window.changePassword = function() {
+// ========== СМЕНА ПАРОЛЯ ==========
+window.openPasswordModal = function() {
   const modal = document.getElementById('password-modal');
   if (!modal) return;
-  const inputs = ['password-old', 'password-new', 'password-confirm'];
-  inputs.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  
+  // Очищаем поля
+  const oldPass = document.getElementById('password-old');
+  const newPass = document.getElementById('password-new');
+  const confirmPass = document.getElementById('password-confirm');
   const errorDiv = document.getElementById('password-error');
+  
+  if (oldPass) oldPass.value = '';
+  if (newPass) newPass.value = '';
+  if (confirmPass) confirmPass.value = '';
   if (errorDiv) errorDiv.style.display = 'none';
+  
   modal.classList.add('active');
 };
 
@@ -254,17 +297,26 @@ async function updatePassword() {
   const errorDiv = document.getElementById('password-error');
   
   if (!oldPass || !newPass) {
-    if (errorDiv) { errorDiv.textContent = 'Заполните все поля'; errorDiv.style.display = 'block'; }
+    if (errorDiv) {
+      errorDiv.textContent = 'Заполните все поля';
+      errorDiv.style.display = 'block';
+    }
     return;
   }
   
   if (newPass.length < 6) {
-    if (errorDiv) { errorDiv.textContent = 'Новый пароль должен быть не менее 6 символов'; errorDiv.style.display = 'block'; }
+    if (errorDiv) {
+      errorDiv.textContent = 'Новый пароль должен быть не менее 6 символов';
+      errorDiv.style.display = 'block';
+    }
     return;
   }
   
   if (newPass !== confirmPass) {
-    if (errorDiv) { errorDiv.textContent = 'Пароли не совпадают'; errorDiv.style.display = 'block'; }
+    if (errorDiv) {
+      errorDiv.textContent = 'Пароли не совпадают';
+      errorDiv.style.display = 'block';
+    }
     return;
   }
   
@@ -276,12 +328,17 @@ async function updatePassword() {
     if (typeof showNotification === 'function') showNotification('Пароль изменен!', 'success');
   } catch(e) {
     if (errorDiv) {
-      errorDiv.textContent = e.code === 'auth/wrong-password' ? 'Неверный старый пароль' : 'Ошибка: ' + e.message;
+      if (e.code === 'auth/wrong-password') {
+        errorDiv.textContent = 'Неверный старый пароль';
+      } else {
+        errorDiv.textContent = 'Ошибка: ' + e.message;
+      }
       errorDiv.style.display = 'block';
     }
   }
 }
 
+// ========== УДАЛЕНИЕ АККАУНТА ==========
 window.deleteAccount = function() {
   if (confirm('Вы уверены? Это действие необратимо. Все ваши данные будут удалены.')) {
     if (confirm('ПОСЛЕДНЕЕ ПРЕДУПРЕЖДЕНИЕ! Аккаунт будет удален навсегда.')) {
@@ -301,6 +358,7 @@ async function deleteAccountConfirm() {
   }
 }
 
+// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
 function formatDate(date) {
   if (!date) return 'Неизвестно';
   const d = date.toDate ? date.toDate() : new Date(date);
@@ -314,6 +372,7 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+// ========== ИНИЦИАЛИЗАЦИЯ ==========
 document.addEventListener('DOMContentLoaded', () => {
   const savePassword = document.getElementById('save-password-btn');
   if (savePassword) savePassword.addEventListener('click', updatePassword);
@@ -328,4 +387,4 @@ document.addEventListener('DOMContentLoaded', () => {
   if (closeEdit) closeEdit.addEventListener('click', closeEditFieldModal);
 });
 
-console.log('👤 profile.js загружен');
+console.log('👤 profile.js с редактированием загружен');
