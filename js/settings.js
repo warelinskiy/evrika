@@ -1,40 +1,27 @@
 // ============================================
-// МОДУЛЬ НАСТРОЕК ПРИЛОЖЕНИЯ
+// МОДУЛЬ НАСТРОЕК
 // ============================================
 
-// Языки
 window.setLanguage = function(lang) {
   localStorage.setItem('language', lang);
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === lang);
   });
   
-  // Переводы
   const translations = {
-    ru: {
-      nav_home: 'Главная',
-      nav_profile: 'Профиль',
-      nav_settings: 'Настройки',
-      login: 'Войти',
-      logout: 'Выйти'
-    },
-    en: {
-      nav_home: 'Home',
-      nav_profile: 'Profile',
-      nav_settings: 'Settings',
-      login: 'Login',
-      logout: 'Logout'
-    }
+    ru: { nav_home: 'Главная', nav_profile: 'Профиль', login: 'Войти', logout: 'Выйти' },
+    en: { nav_home: 'Home', nav_profile: 'Profile', login: 'Login', logout: 'Logout' }
   };
   
   const t = translations[lang];
-  document.querySelectorAll('[data-translate]').forEach(el => {
-    const key = el.dataset.translate;
-    if (t[key]) el.textContent = t[key];
-  });
+  if (t) {
+    document.querySelectorAll('[data-translate]').forEach(el => {
+      const key = el.dataset.translate;
+      if (t[key]) el.textContent = t[key];
+    });
+  }
 };
 
-// Уведомления
 let notificationsEnabled = localStorage.getItem('notifications') === 'true';
 
 window.toggleNotifications = function() {
@@ -50,15 +37,9 @@ window.toggleNotifications = function() {
   }
 };
 
-// Инициализация настроек
 document.addEventListener('DOMContentLoaded', () => {
   const savedLang = localStorage.getItem('language') || 'ru';
   setLanguage(savedLang);
-  
-  const notificationsBtn = document.getElementById('notifications-toggle');
-  if (notificationsBtn) {
-    notificationsEnabled = localStorage.getItem('notifications') === 'true';
-    notificationsBtn.textContent = notificationsEnabled ? 'ON' : 'OFF';
-    notificationsBtn.classList.toggle('active', notificationsEnabled);
-  }
 });
+
+console.log('⚙️ settings.js загружен');
