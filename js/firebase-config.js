@@ -1,7 +1,4 @@
-// ============================================
-// FIREBASE КОНФИГУРАЦИЯ
-// ============================================
-
+// Firebase конфигурация
 const firebaseConfig = {
   apiKey: "AIzaSyC2ueIcLC3KHOtLN7tG7vdfMM2Sv1sYmSk",
   authDomain: "evrika-e2af7.firebaseapp.com",
@@ -12,19 +9,12 @@ const firebaseConfig = {
   measurementId: "G-6TK4JLZXL8"
 };
 
-// Инициализация Firebase
+// Инициализация
 firebase.initializeApp(firebaseConfig);
-
-// Экспортируем сервисы
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Настройка persistence - данные остаются после перезагрузки
+// Настройка persistence
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-
-// Отключаем deprecated методы
-firebase.firestore().settings({ 
-  ignoreUndefinedProperties: true 
-});
 
 console.log('🔥 Firebase инициализирован');
