@@ -5,460 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Эврика | Java Mastery Platform</title>
   
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&family=Material+Symbols+Outlined" rel="stylesheet">
   
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   
-  <style>
-    /* ========== ВСЕ СТИЛИ ЗДЕСЬ ========== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    /* Светлая тема (по умолчанию) */
-    :root {
-      --surface: #f6f6fd;
-      --surface-low: #f0f0f8;
-      --surface-high: #e1e2eb;
-      --surface-lowest: #ffffff;
-      --on-surface: #2d2f34;
-      --on-surface-variant: #5a5b61;
-      --primary: #7b5400;
-      --primary-fixed: #feb300;
-      --on-primary-fixed: #382400;
-      --gradient-start: #FFD54F;
-      --gradient-end: #FFB300;
-      --radius-sm: 1rem;
-      --radius-full: 9999px;
-      --transition: 0.2s ease;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--surface);
-      color: var(--on-surface);
-    }
-
-    /* Навигация */
-    .glass-nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: rgba(246, 246, 253, 0.9);
-      backdrop-filter: blur(20px);
-      z-index: 100;
-      padding: 1rem 2rem;
-    }
-
-    .nav-inner {
-      max-width: 1280px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-family: 'Manrope', sans-serif;
-      font-size: 1.25rem;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .nav-brand-icon {
-      width: 2rem;
-      height: 2rem;
-      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-      border-radius: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-    }
-
-    .nav-link {
-      background: none;
-      border: none;
-      font-size: 0.875rem;
-      font-weight: 600;
-      cursor: pointer;
-      color: var(--on-surface-variant);
-    }
-
-    .nav-link:hover {
-      color: var(--primary);
-    }
-
-    .nav-actions {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-      border: none;
-      border-radius: 2rem;
-      padding: 0.5rem 1.5rem;
-      font-weight: 700;
-      cursor: pointer;
-      color: var(--on-primary-fixed);
-    }
-
-    .btn-secondary {
-      background: var(--surface-high);
-      border: none;
-      border-radius: 2rem;
-      padding: 0.5rem 1.5rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    /* HERO блоки */
-    .landing-wrap {
-      padding-top: 5rem;
-    }
-
-    .hero-section {
-      padding: 4rem 0;
-    }
-
-    .hero-section.alt {
-      background: var(--surface-low);
-    }
-
-    .hero-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 2rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: center;
-    }
-
-    .hero-container.reverse {
-      direction: rtl;
-    }
-
-    .hero-container.reverse .hero-content {
-      direction: ltr;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: var(--surface-high);
-      padding: 0.25rem 1rem;
-      border-radius: 2rem;
-      font-size: 0.7rem;
-      margin-bottom: 1rem;
-    }
-
-    .hero-badge-dot {
-      width: 0.5rem;
-      height: 0.5rem;
-      background: var(--primary);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    .hero-title {
-      font-family: 'Manrope', sans-serif;
-      font-size: 3rem;
-      font-weight: 800;
-      line-height: 1.2;
-      margin-bottom: 1rem;
-    }
-
-    .hero-title-small {
-      font-family: 'Manrope', sans-serif;
-      font-size: 2rem;
-      font-weight: 800;
-      margin-bottom: 1rem;
-    }
-
-    .hero-description {
-      color: var(--on-surface-variant);
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
-    }
-
-    .hero-buttons {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .hero-stats {
-      display: flex;
-      gap: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--surface-high);
-    }
-
-    .hero-stat {
-      text-align: center;
-    }
-
-    .hero-stat-value {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--primary);
-    }
-
-    .hero-stat-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-    }
-
-    .hero-visual-card {
-      background: var(--surface-low);
-      border-radius: 1.5rem;
-      padding: 1rem;
-    }
-
-    .hero-visual-inner {
-      aspect-ratio: 1;
-      background: var(--surface-lowest);
-      border-radius: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .hero-visual-icon {
-      font-size: 5rem;
-      color: var(--primary);
-    }
-
-    .hero-feature-card {
-      display: flex;
-      gap: 1rem;
-      padding: 1rem;
-      background: var(--surface-lowest);
-      border-radius: 1rem;
-      margin-top: 1rem;
-    }
-
-    .hero-stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-
-    .hero-stat-compact {
-      text-align: center;
-      padding: 1rem;
-      background: var(--surface-high);
-      border-radius: 1rem;
-    }
-
-    .process-steps {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .process-step {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-    }
-
-    .step-number {
-      width: 2rem;
-      height: 2rem;
-      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-    }
-
-    .features-grid-compact {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-
-    .feature-compact {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem;
-      background: var(--surface-high);
-      border-radius: 0.75rem;
-    }
-
-    .testimonial-card {
-      display: flex;
-      gap: 1rem;
-      padding: 1rem;
-      background: var(--surface-low);
-      border-radius: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .testimonial-avatar {
-      font-size: 2rem;
-    }
-
-    .cta-section {
-      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-    }
-
-    .cta-section .hero-title-large {
-      font-size: 2.5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #fff, #ffe0a3);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-
-    @media (max-width: 768px) {
-      .hero-container {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-      }
-      .hero-container.reverse {
-        direction: ltr;
-      }
-      .hero-title {
-        font-size: 2rem;
-      }
-      .nav-links {
-        display: none;
-      }
-    }
-
-    /* Модальные окна */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(4px);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.2s;
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .modal {
-      background: var(--surface-lowest);
-      border-radius: 1.5rem;
-      max-width: 500px;
-      width: 90%;
-      padding: 2rem;
-    }
-
-    .form-group {
-      margin-bottom: 1rem;
-    }
-
-    .form-label {
-      display: block;
-      margin-bottom: 0.25rem;
-      font-weight: 600;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid var(--surface-high);
-      border-radius: 0.75rem;
-      background: var(--surface-low);
-    }
-
-    .avatar-emoji-grid {
-      display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      gap: 0.5rem;
-    }
-
-    .avatar-emoji {
-      font-size: 1.5rem;
-      padding: 0.5rem;
-      text-align: center;
-      cursor: pointer;
-      border-radius: 0.5rem;
-    }
-
-    .avatar-emoji.selected {
-      background: var(--primary-fixed);
-    }
-
-    .user-menu {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .user-avatar {
-      width: 2rem;
-      height: 2rem;
-      background: var(--primary-fixed);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    /* Страницы */
-    .page {
-      display: none;
-    }
-
-    .page.active {
-      display: block;
-    }
-
-    .courses-page, .profile-page {
-      padding-top: 5rem;
-      min-height: 100vh;
-    }
-
-    .section-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 2rem;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -466,9 +19,7 @@
 <nav class="glass-nav">
   <div class="nav-inner">
     <div class="nav-brand" onclick="showPage('landing')">
-      <div class="nav-brand-icon">
-        <span class="material-symbols-outlined" style="color: #382400;">lightbulb</span>
-      </div>
+      <div class="nav-brand-icon"><span class="material-symbols-outlined" style="color: #382400;">lightbulb</span></div>
       <span>Эврика</span>
     </div>
     <div class="nav-links">
@@ -476,11 +27,9 @@
       <button class="nav-link" onclick="showPage('profile')">Профиль</button>
     </div>
     <div class="nav-actions">
-      <div id="auth-container">
-        <button class="btn-secondary" onclick="openAuthModal()">Войти</button>
-      </div>
+      <div id="auth-container"><button class="btn-secondary" id="auth-trigger-btn">Войти</button></div>
       <div id="user-menu" class="user-menu" style="display: none;">
-        <div class="user-avatar" id="user-avatar" onclick="showPage('profile')"></div>
+        <div class="user-avatar" id="user-avatar"></div>
         <span id="user-name"></span>
         <button class="icon-btn" onclick="logout()">🚪</button>
       </div>
@@ -491,41 +40,27 @@
 <!-- МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ -->
 <div id="auth-modal" class="modal-overlay">
   <div class="modal">
-    <h2>Добро пожаловать</h2>
-    <div id="login-form">
-      <div class="form-group">
-        <label class="form-label">Email или Username</label>
-        <input type="text" id="login-username" class="form-input">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Пароль</label>
-        <input type="password" id="login-password" class="form-input">
-      </div>
-      <button class="btn-primary" onclick="login()">Войти</button>
-      <button class="btn-secondary" onclick="showRegisterForm()">Регистрация</button>
+    <div class="modal-header">
+      <h2 class="modal-title">Добро пожаловать</h2>
+      <button class="modal-close" onclick="closeAuthModal()">&times;</button>
     </div>
-    <div id="register-form" style="display: none;">
-      <div class="form-group">
-        <label class="form-label">Username</label>
-        <input type="text" id="register-username" class="form-input">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Имя</label>
-        <input type="text" id="register-name" class="form-input">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input type="email" id="register-email" class="form-input">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Пароль</label>
-        <input type="password" id="register-password" class="form-input">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Аватар</label>
-        <div class="avatar-emoji-grid" id="avatar-emoji-grid"></div>
-      </div>
-      <button class="btn-primary" onclick="register()">Зарегистрироваться</button>
+    <div id="auth-error" class="auth-error" style="display: none;"></div>
+    
+    <div id="login-form">
+      <div class="form-group"><label class="form-label">Email или Username</label><input type="text" id="login-username" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Пароль</label><input type="password" id="login-password" class="form-input"></div>
+      <button id="login-submit" class="btn-primary" style="width:100%">Войти</button>
+      <p style="text-align:center; margin-top:1rem;"><button onclick="showRegisterForm()" style="background:none; border:none; color:var(--primary); cursor:pointer;">Нет аккаунта? Зарегистрироваться</button></p>
+    </div>
+    
+    <div id="register-form" style="display:none;">
+      <div class="form-group"><label class="form-label">Username</label><input type="text" id="register-username" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Имя</label><input type="text" id="register-name" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" id="register-email" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Пароль</label><input type="password" id="register-password" class="form-input"></div>
+      <div class="form-group"><label class="form-label">Аватар</label><div class="avatar-emoji-grid" id="avatar-emoji-grid"></div></div>
+      <button id="register-submit" class="btn-primary" style="width:100%">Зарегистрироваться</button>
+      <p style="text-align:center; margin-top:1rem;"><button onclick="showLoginForm()" style="background:none; border:none; color:var(--primary); cursor:pointer;">Уже есть аккаунт? Войти</button></p>
     </div>
   </div>
 </div>
@@ -538,170 +73,69 @@
     <section class="hero-section">
       <div class="hero-container">
         <div class="hero-content">
-          <div class="hero-badge">
-            <span class="hero-badge-dot"></span>
-            <span>Онлайн платформа обучения</span>
-          </div>
+          <div class="hero-badge"><span class="hero-badge-dot"></span><span>Онлайн платформа обучения</span></div>
           <h1 class="hero-title">Учись Java бесплатно в интерактивной игровой системе</h1>
           <p class="hero-description">Осваивай программирование, создавай свои тесты и делись знаниями с другими.</p>
-          <div class="hero-buttons">
-            <button class="btn-primary" onclick="showPage('profile')">Начать обучение</button>
-            <button class="btn-secondary" onclick="openAuthModal()">У меня уже есть аккаунт</button>
-          </div>
-          <div class="hero-stats">
-            <div class="hero-stat"><span class="hero-stat-value">50K+</span><span class="hero-stat-label">Активных студентов</span></div>
-            <div class="hero-stat"><span class="hero-stat-value">98%</span><span class="hero-stat-label">Успешных выпускников</span></div>
-            <div class="hero-stat"><span class="hero-stat-value">24/7</span><span class="hero-stat-label">Поддержка</span></div>
-          </div>
+          <div class="hero-buttons"><button class="btn-primary" onclick="showPage('profile')">Начать обучение</button><button class="btn-secondary" onclick="openAuthModal()">У меня уже есть аккаунт</button></div>
+          <div class="hero-stats"><div class="hero-stat"><span class="hero-stat-value">50K+</span><span class="hero-stat-label">Активных студентов</span></div><div class="hero-stat"><span class="hero-stat-value">98%</span><span class="hero-stat-label">Успешных выпускников</span></div><div class="hero-stat"><span class="hero-stat-value">24/7</span><span class="hero-stat-label">Поддержка</span></div></div>
         </div>
-        <div class="hero-visual">
-          <div class="hero-visual-card">
-            <div class="hero-visual-inner">
-              <span class="material-symbols-outlined hero-visual-icon">terminal</span>
-            </div>
-          </div>
-        </div>
+        <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">terminal</span></div></div></div>
       </div>
     </section>
 
     <!-- БЛОК 2 -->
     <section class="hero-section alt">
       <div class="hero-container reverse">
-        <div class="hero-visual">
-          <div class="hero-visual-card">
-            <div class="hero-visual-inner">
-              <span class="material-symbols-outlined hero-visual-icon">payments</span>
-            </div>
-          </div>
-        </div>
-        <div class="hero-content">
-          <h2 class="hero-title-small">Создавай и зарабатывай</h2>
-          <p class="hero-description">Наша платформа позволяет не только учиться, но и становиться автором. Публикуйте свои тесты и получайте вознаграждение.</p>
-          <div class="hero-feature-card">
-            <span class="material-symbols-outlined">payments</span>
-            <div><strong>Монетизируйте свои знания</strong><br>Зарабатывайте баллы за популярные курсы</div>
-          </div>
-        </div>
+        <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">payments</span></div></div></div>
+        <div class="hero-content"><h2 class="hero-title-small">Создавай и зарабатывай</h2><p class="hero-description">Публикуйте свои тесты и получайте вознаграждение за качественный контент.</p><div class="hero-feature-card"><span class="material-symbols-outlined">payments</span><div><strong>Монетизируйте знания</strong><br>Зарабатывайте баллы за популярные курсы</div></div></div>
       </div>
     </section>
 
     <!-- БЛОК 3 -->
     <section class="hero-section">
       <div class="hero-container">
-        <div class="hero-content">
-          <h2 class="hero-title-small">Научный подход к обучению</h2>
-          <p class="hero-description">Алгоритмы интервальных повторений и когнитивной психологии для максимального усвоения материала.</p>
-          <div class="hero-stats-grid">
-            <div class="hero-stat-compact"><span class="hero-stat-value">90%</span><br>Усвоение</div>
-            <div class="hero-stat-compact"><span class="hero-stat-value">3x</span><br>Быстрее</div>
-            <div class="hero-stat-compact"><span class="hero-stat-value">24/7</span><br>Доступно</div>
-          </div>
-        </div>
-        <div class="hero-visual">
-          <div class="hero-visual-card">
-            <div class="hero-visual-inner">
-              <span class="material-symbols-outlined hero-visual-icon">psychology</span>
-            </div>
-          </div>
-        </div>
+        <div class="hero-content"><h2 class="hero-title-small">Научный подход к обучению</h2><p class="hero-description">Алгоритмы интервальных повторений для максимального усвоения.</p><div class="hero-stats-grid"><div class="hero-stat-compact"><span class="hero-stat-value">90%</span><br>Усвоение</div><div class="hero-stat-compact"><span class="hero-stat-value">3x</span><br>Быстрее</div><div class="hero-stat-compact"><span class="hero-stat-value">24/7</span><br>Доступно</div></div></div>
+        <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">psychology</span></div></div></div>
       </div>
     </section>
 
     <!-- БЛОК 4 -->
     <section class="hero-section alt">
       <div class="hero-container reverse">
-        <div class="hero-visual">
-          <div class="hero-visual-card">
-            <div class="hero-visual-inner">
-              <span class="material-symbols-outlined hero-visual-icon">school</span>
-            </div>
-          </div>
-        </div>
-        <div class="hero-content">
-          <h2 class="hero-title-small">Как проходит обучение</h2>
-          <div class="process-steps">
-            <div class="process-step"><div class="step-number">1</div><div><strong>Учись</strong><br>Короткие уроки без воды</div></div>
-            <div class="process-step"><div class="step-number">2</div><div><strong>Тестируй</strong><br>Интерактивные тесты</div></div>
-            <div class="process-step"><div class="step-number">3</div><div><strong>Практикуй</strong><br>Живые задачи по кодингу</div></div>
-          </div>
-        </div>
+        <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">school</span></div></div></div>
+        <div class="hero-content"><h2 class="hero-title-small">Как проходит обучение</h2><div class="process-steps"><div class="process-step"><div class="step-number">1</div><div><strong>Учись</strong><br>Короткие уроки без воды</div></div><div class="process-step"><div class="step-number">2</div><div><strong>Тестируй</strong><br>Интерактивные тесты</div></div><div class="process-step"><div class="step-number">3</div><div><strong>Практикуй</strong><br>Живые задачи</div></div></div></div>
       </div>
     </section>
 
     <!-- БЛОК 5 -->
     <section class="hero-section">
       <div class="hero-container">
-        <div class="hero-content">
-          <h2 class="hero-title-small">Глубокое понимание вместо заучивания</h2>
-          <p class="hero-description">Программирование — это логика, а не синтаксис. Наша методика фокусируется на фундаментальных принципах Java.</p>
-          <button class="btn-primary" onclick="showPage('profile')">Начать глубокое погружение</button>
-        </div>
-        <div class="hero-visual">
-          <div class="hero-visual-card">
-            <div class="hero-visual-inner">
-              <span class="material-symbols-outlined hero-visual-icon">architecture</span>
-            </div>
-          </div>
-        </div>
+        <div class="hero-content"><h2 class="hero-title-small">Глубокое понимание вместо заучивания</h2><p class="hero-description">Программирование — это логика, а не синтаксис.</p><button class="btn-primary" onclick="showPage('profile')">Начать погружение</button></div>
+        <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">architecture</span></div></div></div>
       </div>
     </section>
 
     <!-- БЛОК 6 -->
     <section class="hero-section alt">
       <div class="hero-container reverse">
-        <div class="hero-visual">
-          <div class="hero-visual-card">
-            <div class="hero-visual-inner">
-              <span class="material-symbols-outlined hero-visual-icon">schedule</span>
-            </div>
-          </div>
-        </div>
-        <div class="hero-content">
-          <h2 class="hero-title-small">Обучение без давления</h2>
-          <p class="hero-description">Никаких обязательных вебинаров или расписаний. Учитесь в своем темпе 24/7.</p>
-          <div class="features-grid-compact">
-            <div class="feature-compact"><span class="material-symbols-outlined">schedule</span> Свободный график</div>
-            <div class="feature-compact"><span class="material-symbols-outlined">devices</span> Любое устройство</div>
-            <div class="feature-compact"><span class="material-symbols-outlined">trending_up</span> Свой темп</div>
-            <div class="feature-compact"><span class="material-symbols-outlined">psychology</span> Без дедлайнов</div>
-          </div>
-        </div>
+        <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">schedule</span></div></div></div>
+        <div class="hero-content"><h2 class="hero-title-small">Обучение без давления</h2><p class="hero-description">Учитесь в своем темпе 24/7. Никаких дедлайнов.</p><div class="features-grid-compact"><div class="feature-compact"><span class="material-symbols-outlined">schedule</span> Свободный график</div><div class="feature-compact"><span class="material-symbols-outlined">devices</span> Любое устройство</div><div class="feature-compact"><span class="material-symbols-outlined">trending_up</span> Свой темп</div><div class="feature-compact"><span class="material-symbols-outlined">psychology</span> Без дедлайнов</div></div></div>
       </div>
     </section>
 
     <!-- БЛОК 7 -->
     <section class="hero-section">
       <div class="hero-container">
-        <div class="hero-content">
-          <h2 class="hero-title-small">Что говорят наши студенты</h2>
-          <div class="testimonial-card"><div class="testimonial-avatar">👨‍💻</div><div><em>"Лучший курс по Java! За 3 месяца с нуля до Junior."</em><br>— Алексей</div></div>
-          <div class="testimonial-card"><div class="testimonial-avatar">👩‍💻</div><div><em>"Удобная платформа, понятные уроки. Рекомендую!"</em><br>— Мария</div></div>
-        </div>
-        <div class="hero-visual">
-          <div class="hero-visual-card">
-            <div class="hero-visual-inner">
-              <span class="material-symbols-outlined hero-visual-icon">star_rate</span>
-            </div>
-          </div>
-        </div>
+        <div class="hero-content"><h2 class="hero-title-small">Что говорят студенты</h2><div class="testimonial-card"><div class="testimonial-avatar">👨‍💻</div><div><em>"Лучший курс по Java!"</em><br>— Алексей</div></div><div class="testimonial-card"><div class="testimonial-avatar">👩‍💻</div><div><em>"Удобная платформа, рекомендую!"</em><br>— Мария</div></div></div>
+        <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">star_rate</span></div></div></div>
       </div>
     </section>
 
     <!-- БЛОК 8 CTA -->
     <section class="hero-section alt cta-section">
       <div class="hero-container reverse">
-        <div class="hero-visual">
-          <div class="hero-visual-card">
-            <div class="hero-visual-inner">
-              <span class="material-symbols-outlined hero-visual-icon">rocket_launch</span>
-            </div>
-          </div>
-        </div>
-        <div class="hero-content">
-          <h2 class="hero-title-large">Готов начать свой путь в IT?</h2>
-          <p class="hero-description">Присоединяйся к тысячам студентов на платформе Эврика</p>
-          <button class="btn-primary" onclick="showPage('profile')">Начать бесплатно</button>
-        </div>
+        <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">rocket_launch</span></div></div></div>
+        <div class="hero-content"><h2 class="hero-title-large">Готов начать путь в IT?</h2><p class="hero-description">Присоединяйся к тысячам студентов</p><button class="btn-primary" onclick="showPage('profile')">Начать бесплатно</button></div>
       </div>
     </section>
 
@@ -711,153 +145,15 @@
 <!-- ПРОФИЛЬ -->
 <div id="page-profile" class="page">
   <div class="profile-page">
-    <div class="section-inner" id="profile-container">
-      <div style="text-align:center; padding:2rem;">Загрузка профиля...</div>
-    </div>
+    <div class="section-inner" id="profile-container"></div>
   </div>
 </div>
 
 <!-- СКРИПТЫ -->
-<script>
-  // ========== ПРОСТЫЕ ГЛОБАЛЬНЫЕ ФУНКЦИИ ==========
-  window.showPage = function(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const target = document.getElementById(`page-${pageId}`);
-    if (target) target.classList.add('active');
-    if (pageId === 'profile' && typeof renderProfilePage === 'function') renderProfilePage();
-    window.scrollTo({ top: 0 });
-  };
-
-  window.showNotification = function(msg, type) {
-    alert(msg);
-  };
-
-  // ========== АВАТАРЫ ==========
-  const animalEmojis = ['🐱', '🐶', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵'];
-  let selectedAvatar = '🐱';
-
-  function renderAvatarGrid() {
-    const grid = document.getElementById('avatar-emoji-grid');
-    if (!grid) return;
-    grid.innerHTML = animalEmojis.map(e => `<div class="avatar-emoji ${selectedAvatar === e ? 'selected' : ''}" onclick="selectAvatar('${e}')">${e}</div>`).join('');
-  }
-
-  window.selectAvatar = function(emoji) {
-    selectedAvatar = emoji;
-    renderAvatarGrid();
-  };
-
-  // ========== АВТОРИЗАЦИЯ ==========
-  let currentUser = null;
-
-  window.openAuthModal = function() {
-    document.getElementById('auth-modal').classList.add('active');
-    document.getElementById('login-form').style.display = 'block';
-    document.getElementById('register-form').style.display = 'none';
-  };
-
-  window.closeAuthModal = function() {
-    document.getElementById('auth-modal').classList.remove('active');
-  };
-
-  window.showRegisterForm = function() {
-    document.getElementById('login-form').style.display = 'none';
-    document.getElementById('register-form').style.display = 'block';
-    renderAvatarGrid();
-  };
-
-  window.login = async function() {
-    const email = document.getElementById('login-username').value;
-    const password = document.getElementById('login-password').value;
-    try {
-      const user = await auth.signInWithEmailAndPassword(email, password);
-      currentUser = user.user;
-      updateUI();
-      closeAuthModal();
-      showNotification('Добро пожаловать!', 'success');
-    } catch(e) { alert('Ошибка: ' + e.message); }
-  };
-
-  window.register = async function() {
-    const username = document.getElementById('register-username').value;
-    const name = document.getElementById('register-name').value;
-    const email = document.getElementById('register-email').value;
-    const password = document.getElementById('register-password').value;
-    try {
-      const user = await auth.createUserWithEmailAndPassword(email, password);
-      await user.user.updateProfile({ displayName: name });
-      await db.collection('users').doc(user.user.uid).set({
-        username, name, email, avatar: selectedAvatar,
-        bio: '', location: '', website: '',
-        completedLessons: []
-      });
-      currentUser = user.user;
-      updateUI();
-      closeAuthModal();
-      showNotification('Регистрация успешна!', 'success');
-    } catch(e) { alert('Ошибка: ' + e.message); }
-  };
-
-  window.logout = async function() {
-    await auth.signOut();
-    currentUser = null;
-    updateUI();
-    showPage('landing');
-  };
-
-  function updateUI() {
-    const authDiv = document.getElementById('auth-container');
-    const userMenu = document.getElementById('user-menu');
-    const userName = document.getElementById('user-name');
-    const userAvatar = document.getElementById('user-avatar');
-    if (currentUser) {
-      authDiv.style.display = 'none';
-      userMenu.style.display = 'flex';
-      userName.textContent = currentUser.email.split('@')[0];
-      userAvatar.textContent = '👤';
-    } else {
-      authDiv.style.display = 'flex';
-      userMenu.style.display = 'none';
-    }
-  }
-
-  // Профиль
-  window.renderProfilePage = async function() {
-    const container = document.getElementById('profile-container');
-    if (!currentUser) {
-      container.innerHTML = `<div style="text-align:center; padding:2rem;"><h2>Вы не авторизованы</h2><button class="btn-primary" onclick="openAuthModal()">Войти</button></div>`;
-      return;
-    }
-    const doc = await db.collection('users').doc(currentUser.uid).get();
-    const data = doc.data() || {};
-    container.innerHTML = `
-      <div style="text-align:center;">
-        <div style="font-size:4rem;">${data.avatar || '👤'}</div>
-        <h1>${data.name || currentUser.displayName || ''}</h1>
-        <p>@${data.username || ''}</p>
-        <p>${data.bio || 'Напишите о себе...'}</p>
-        <button class="btn-primary" onclick="alert('Редактирование профиля в разработке')">Редактировать</button>
-        <button class="btn-secondary" onclick="logout()">Выйти</button>
-      </div>
-    `;
-  };
-
-  // Инициализация
-  auth.onAuthStateChanged(async (user) => {
-    currentUser = user;
-    updateUI();
-    if (user) {
-      const doc = await db.collection('users').doc(user.uid).get();
-      window.userData = doc.data();
-    }
-  });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const modal = document.getElementById('auth-modal');
-    modal.addEventListener('click', (e) => { if (e.target === modal) closeAuthModal(); });
-    showPage('landing');
-  });
-</script>
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/app.js"></script>
 
 </body>
 </html>
