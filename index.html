@@ -1,234 +1,34 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Эврика | Java Mastery Platform</title>
-  
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&family=Material+Symbols+Outlined" rel="stylesheet">
-  
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  
-  <!-- Styles -->
-  <link rel="stylesheet" href="css/styles.css">
-</head>
-<body data-theme="light">
-
-<!-- TOP NAVIGATION -->
-<nav class="top-nav glass-nav">
-  <div class="nav-inner">
-    <div class="nav-brand" onclick="showPage('landing')">
-      <div class="nav-brand-icon eureka-gradient">
-        <span class="material-symbols-outlined">lightbulb</span>
-      </div>
-      <span>Эврика</span>
-    </div>
-    
-    <div class="nav-links">
-      <button class="nav-link" data-page="landing" onclick="showPage('landing')">Главная</button>
-      <button class="nav-link" data-page="courses" onclick="showPage('courses')">Курсы</button>
-    </div>
-    
-    <div class="nav-actions">
-      <div class="theme-toggle">
-        <button class="theme-trigger-btn icon-btn">
-          <span class="material-symbols-outlined">palette</span>
-        </button>
-        <div class="theme-dropdown" id="theme-dropdown">
-          <div class="theme-option" data-theme="light">
-            <span class="material-symbols-outlined">light_mode</span>
-            <span>Светлая</span>
-          </div>
-          <div class="theme-option" data-theme="dark">
-            <span class="material-symbols-outlined">dark_mode</span>
-            <span>Тёмная</span>
-          </div>
-          <div class="theme-option" data-theme="sunset">
-            <span class="material-symbols-outlined">wb_sunny</span>
-            <span>Закат</span>
-          </div>
-          <div class="theme-option" data-theme="ocean">
-            <span class="material-symbols-outlined">waves</span>
-            <span>Океан</span>
-          </div>
-          <div class="theme-option" data-theme="lavender">
-            <span class="material-symbols-outlined">spa</span>
-            <span>Лаванда</span>
-          </div>
-        </div>
-      </div>
-      <div class="lang-toggle">
-        <button class="lang-btn" data-lang="ru" onclick="setLanguage('ru')">RU</button>
-        <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">EN</button>
-      </div>
-      
-      <div id="auth-container" style="display: flex; gap: 0.5rem;">
-        <button id="auth-trigger-btn" class="btn-secondary" data-t="nav_login">Войти</button>
-      </div>
-      
-      <div id="user-menu" class="user-menu" style="display: none;">
-        <div class="user-avatar" id="user-avatar"></div>
-        <span id="user-name"></span>
-        <button class="icon-btn" onclick="logout()">
-          <span class="material-symbols-outlined">logout</span>
-        </button>
-      </div>
-    </div>
-  </div>
-</nav>
-
-<!-- AUTH MODAL -->
-<div id="auth-modal" class="modal-overlay">
-  <div class="modal">
-    <div class="modal-header">
-      <h2 class="modal-title" data-t="welcome">Добро пожаловать</h2>
-      <button class="modal-close" onclick="closeAuthModal()">&times;</button>
-    </div>
-    <div id="auth-error" class="auth-error" style="display: none;"></div>
-    
-    <div id="login-form">
-      <div class="form-group">
-        <label class="form-label" data-t="username_or_email">Email или Username</label>
-        <input type="text" id="login-username" class="form-input" placeholder="example@mail.com или @username">
-      </div>
-      <div class="form-group">
-        <label class="form-label" data-t="password">Пароль</label>
-        <input type="password" id="login-password" class="form-input" placeholder="••••••">
-      </div>
-      <button id="login-submit" class="btn-primary" style="width: 100%;" data-t="login_btn">Войти</button>
-      <p style="text-align: center; margin-top: 1rem;">
-        <button onclick="showRegisterForm()" style="background: none; border: none; color: var(--primary); cursor: pointer;" data-t="no_account">Нет аккаунта? Зарегистрироваться</button>
-      </p>
-    </div>
-    
-    <div id="register-form" style="display: none;">
-      <div class="form-group">
-        <label class="form-label" data-t="username">Username</label>
-        <input type="text" id="register-username" class="form-input" placeholder="@username">
-        <small style="color: var(--on-surface-variant); font-size: 0.7rem;">Только буквы, цифры и _</small>
-      </div>
-      <div class="form-group">
-        <label class="form-label" data-t="name">Имя</label>
-        <input type="text" id="register-name" class="form-input" placeholder="Ваше имя">
-      </div>
-      <div class="form-group">
-        <label class="form-label" data-t="email">Email</label>
-        <input type="email" id="register-email" class="form-input" placeholder="example@mail.com">
-      </div>
-      <div class="form-group">
-        <label class="form-label" data-t="password">Пароль</label>
-        <input type="password" id="register-password" class="form-input" placeholder="минимум 6 символов">
-      </div>
-      <div class="form-group">
-        <label class="form-label" data-t="avatar_emoji">Выберите аватар (животное)</label>
-        <div class="avatar-emoji-grid" id="avatar-emoji-grid">
-          <!-- Эмодзи будут добавлены через JS -->
-        </div>
-      </div>
-      <button id="register-submit" class="btn-primary" style="width: 100%;" data-t="register_btn">Зарегистрироваться</button>
-      <p style="text-align: center; margin-top: 1rem;">
-        <button onclick="showLoginForm()" style="background: none; border: none; color: var(--primary); cursor: pointer;" data-t="has_account">Уже есть аккаунт? Войти</button>
-      </p>
-    </div>
-  </div>
-</div>
-
-<!-- CREATE COURSE MODAL -->
-<div id="create-course-modal" class="modal-overlay">
-  <div class="modal">
-    <div class="modal-header">
-      <h2 class="modal-title" data-t="create_course">Создать курс</h2>
-      <button class="modal-close" onclick="closeCreateCourseModal()">&times;</button>
-    </div>
-    <div class="form-group">
-      <label class="form-label" data-t="course_title">Название курса</label>
-      <input type="text" id="course-title" class="form-input" placeholder="Введите название">
-    </div>
-    <div class="form-group">
-      <label class="form-label" data-t="course_desc">Описание</label>
-      <textarea id="course-description" class="form-textarea" placeholder="Расскажите о курсе"></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label" data-t="course_icon">Иконка (эмодзи)</label>
-      <input type="text" id="course-icon" class="form-input" placeholder="📚" maxlength="2">
-    </div>
-    <div class="form-group">
-      <label class="form-label" data-t="course_level">Уровень сложности</label>
-      <select id="course-level" class="form-select">
-        <option value="Начинающий" data-t="beginner">Начинающий</option>
-        <option value="Средний" data-t="intermediate">Средний</option>
-        <option value="Продвинутый" data-t="advanced">Продвинутый</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label" data-t="visibility">Видимость</label>
-      <input type="hidden" id="course-visibility" value="public">
-      <div class="visibility-options">
-        <div class="visibility-option selected" data-value="public" onclick="setVisibility('public')">
-          <span class="material-symbols-outlined">public</span>
-          <span data-t="public_btn">Для всех</span>
-        </div>
-        <div class="visibility-option" data-value="link" onclick="setVisibility('link')">
-          <span class="material-symbols-outlined">link</span>
-          <span data-t="link_btn">По ссылке</span>
-        </div>
-        <div class="visibility-option" data-value="private" onclick="setVisibility('private')">
-          <span class="material-symbols-outlined">lock</span>
-          <span data-t="private_btn">Только я</span>
-        </div>
-      </div>
-    </div>
-    <button id="create-course-submit" class="btn-primary" style="width: 100%;" data-t="create_btn">Создать курс</button>
-  </div>
-</div>
-
-<!-- EDIT PROFILE MODAL -->
-<div id="edit-profile-modal" class="modal-overlay">
-  <div class="modal">
-    <div class="modal-header">
-      <h2 class="modal-title" data-t="edit_profile">Редактировать профиль</h2>
-      <button class="modal-close" onclick="closeEditProfileModal()">&times;</button>
-    </div>
-    <div class="form-group">
-      <label class="form-label" data-t="name">Имя</label>
-      <input type="text" id="edit-name" class="form-input">
-    </div>
-    <div class="form-group">
-      <label class="form-label" data-t="bio">О себе</label>
-      <textarea id="edit-bio" class="form-textarea" rows="3" placeholder="Расскажите о себе..."></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label" data-t="location">Местоположение</label>
-      <input type="text" id="edit-location" class="form-input" placeholder="Город, страна">
-    </div>
-    <div class="form-group">
-      <label class="form-label" data-t="website">Сайт</label>
-      <input type="url" id="edit-website" class="form-input" placeholder="https://...">
-    </div>
-    <button id="save-profile-btn" class="btn-primary" style="width: 100%;" data-t="save_changes">Сохранить изменения</button>
-  </div>
-</div>
-
-<!-- PAGES -->
-
 <!-- LANDING PAGE -->
 <div id="page-landing" class="page active">
   <div class="landing-wrap">
-    <section class="hero">
-      <div class="hero-inner">
+    
+    <!-- HERO БЛОК 1 - Текст слева, картинка справа -->
+    <section class="hero-section">
+      <div class="hero-container">
         <div class="hero-content">
           <div class="hero-badge">
             <span class="hero-badge-dot"></span>
             <span data-t="hero_badge">Онлайн платформа обучения</span>
           </div>
           <h1 class="hero-title" data-t="hero_title">Учись Java бесплатно в интерактивной игровой системе</h1>
-          <p class="hero-subtitle" data-t="hero_subtitle">Осваивай программирование, создавай свои тесты и делись знаниями с другими.</p>
-          <div class="hero-actions">
+          <p class="hero-description" data-t="hero_subtitle">Осваивай программирование, создавай свои тесты и делись знаниями с другими.</p>
+          <div class="hero-buttons">
             <button class="btn-primary lg" onclick="showPage('courses')" data-t="hero_cta">Начать обучение</button>
+            <button class="btn-secondary lg" onclick="openAuthModal()" data-t="hero_login">У меня уже есть аккаунт</button>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <span class="hero-stat-value">50K+</span>
+              <span class="hero-stat-label" data-t="stat_students">Активных студентов</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-value">98%</span>
+              <span class="hero-stat-label" data-t="stat_success">Успешных выпускников</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-value">24/7</span>
+              <span class="hero-stat-label" data-t="stat_support">Поддержка</span>
+            </div>
           </div>
         </div>
         <div class="hero-visual">
@@ -241,72 +41,203 @@
         </div>
       </div>
     </section>
-  </div>
-</div>
 
-<!-- COURSES PAGE -->
-<div id="page-courses" class="page">
-  <div class="courses-page">
-    <div class="section-inner">
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="section-title" data-t="courses_title">Курсы программирования</h1>
-        <button id="create-course-btn" class="btn-primary">
-          <span class="material-symbols-outlined">add</span>
-          <span data-t="create_course_btn">Создать курс</span>
-        </button>
+    <!-- HERO БЛОК 2 - Картинка слева, текст справа -->
+    <section class="hero-section alt">
+      <div class="hero-container reverse">
+        <div class="hero-visual">
+          <div class="hero-visual-card">
+            <div class="hero-visual-inner">
+              <span class="material-symbols-outlined hero-visual-icon">code_blocks</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-content">
+          <h2 class="hero-title-small" data-t="create_title">Создавай и зарабатывай</h2>
+          <p class="hero-description" data-t="create_text">Наша платформа позволяет не только учиться, но и становиться автором. Публикуйте свои собственные тесты и практические задачи. Превращайте свою экспертизу в ценность для сообщества и получайте вознаграждение за качественный контент.</p>
+          <div class="hero-feature-card">
+            <span class="material-symbols-outlined hero-feature-icon">payments</span>
+            <div>
+              <h4 data-t="create_card_title">Монетизируйте свои знания</h4>
+              <p data-t="create_card_text">Зарабатывайте баллы и реальные бонусы за популярные курсы</p>
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="courses-container" class="courses-grid"></div>
-    </div>
+    </section>
+
+    <!-- HERO БЛОК 3 - Текст слева, картинка справа -->
+    <section class="hero-section">
+      <div class="hero-container">
+        <div class="hero-content">
+          <h2 class="hero-title-small" data-t="science_title">Научный подход к обучению</h2>
+          <p class="hero-description" data-t="science_text">В основе Eureka лежат алгоритмы интервальных повторений и когнитивной психологии. Мы не просто даем теорию — мы встраиваем знания в вашу долгосрочную память через регулярную практику и адаптивные тесты, которые подстраиваются под ваш темп.</p>
+          <div class="hero-stats-grid">
+            <div class="hero-stat-compact">
+              <span class="hero-stat-value">90%</span>
+              <span class="hero-stat-label" data-t="stat_1">Усвоение материала</span>
+            </div>
+            <div class="hero-stat-compact">
+              <span class="hero-stat-value">3x</span>
+              <span class="hero-stat-label" data-t="stat_2">Быстрее обучение</span>
+            </div>
+            <div class="hero-stat-compact">
+              <span class="hero-stat-value">24/7</span>
+              <span class="hero-stat-label" data-t="stat_3">Доступность системы</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-visual-card">
+            <div class="hero-visual-inner">
+              <span class="material-symbols-outlined hero-visual-icon">psychology</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HERO БЛОК 4 - Картинка слева, текст справа -->
+    <section class="hero-section alt">
+      <div class="hero-container reverse">
+        <div class="hero-visual">
+          <div class="hero-visual-card">
+            <div class="hero-visual-inner">
+              <span class="material-symbols-outlined hero-visual-icon">school</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-content">
+          <h2 class="hero-title-small" data-t="process_title">Как проходит обучение</h2>
+          <div class="process-steps">
+            <div class="process-step">
+              <div class="step-number">1</div>
+              <div>
+                <h4 data-t="step1_title">Учись</h4>
+                <p data-t="step1_text">Короткие и емкие уроки без "воды"</p>
+              </div>
+            </div>
+            <div class="process-step">
+              <div class="step-number">2</div>
+              <div>
+                <h4 data-t="step2_title">Тестируй</h4>
+                <p data-t="step2_text">Интерактивные тесты в реальном времени</p>
+              </div>
+            </div>
+            <div class="process-step">
+              <div class="step-number">3</div>
+              <div>
+                <h4 data-t="step3_title">Практикуй</h4>
+                <p data-t="step3_text">Решение живых задач по кодингу</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HERO БЛОК 5 - Текст слева, картинка справа -->
+    <section class="hero-section">
+      <div class="hero-container">
+        <div class="hero-content">
+          <h2 class="hero-title-small" data-t="deep_title">Глубокое понимание вместо заучивания</h2>
+          <p class="hero-description" data-t="deep_text">Мы верим, что программирование — это логика, а не синтаксис. Наша методика сфокусирована на фундаментальных принципах Java, позволяя вам писать эффективный код даже в незнакомых ситуациях.</p>
+          <button class="btn-primary" onclick="showPage('courses')" data-t="deep_cta">Начать глубокое погружение</button>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-visual-card">
+            <div class="hero-visual-inner">
+              <span class="material-symbols-outlined hero-visual-icon">architecture</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HERO БЛОК 6 - Картинка слева, текст справа -->
+    <section class="hero-section alt">
+      <div class="hero-container reverse">
+        <div class="hero-visual">
+          <div class="hero-visual-card">
+            <div class="hero-visual-inner">
+              <span class="material-symbols-outlined hero-visual-icon">schedule</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-content">
+          <h2 class="hero-title-small" data-t="flex_title">Обучение без давления</h2>
+          <p class="hero-description" data-t="flex_text">Никаких обязательных вебинаров или строгих расписаний. Вы сами определяете интенсивность обучения. Наша платформа доступна 24/7, позволяя возвращаться к урокам именно тогда, когда у вас есть вдохновение и время.</p>
+          <div class="features-grid-compact">
+            <div class="feature-compact">
+              <span class="material-symbols-outlined">schedule</span>
+              <span data-t="feat_1">Свободный график</span>
+            </div>
+            <div class="feature-compact">
+              <span class="material-symbols-outlined">devices</span>
+              <span data-t="feat_2">Любое устройство</span>
+            </div>
+            <div class="feature-compact">
+              <span class="material-symbols-outlined">trending_up</span>
+              <span data-t="feat_3">Свой темп</span>
+            </div>
+            <div class="feature-compact">
+              <span class="material-symbols-outlined">psychology</span>
+              <span data-t="feat_4">Без дедлайнов</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HERO БЛОК 7 - Текст слева, картинка справа (Отзывы) -->
+    <section class="hero-section">
+      <div class="hero-container">
+        <div class="hero-content">
+          <h2 class="hero-title-small" data-t="reviews_title">Что говорят наши студенты</h2>
+          <div class="testimonial-card">
+            <div class="testimonial-avatar">👨‍💻</div>
+            <div class="testimonial-content">
+              <p class="testimonial-text" data-t="review_1">"Лучший курс по Java! За 3 месяца прошел с нуля до Junior разработчика."</p>
+              <p class="testimonial-author">— Алексей Иванов</p>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-avatar">👩‍💻</div>
+            <div class="testimonial-content">
+              <p class="testimonial-text" data-t="review_2">"Удобная платформа, понятные уроки и отличные тесты. Рекомендую!"</p>
+              <p class="testimonial-author">— Мария Соколова</p>
+            </div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-visual-card">
+            <div class="hero-visual-inner">
+              <span class="material-symbols-outlined hero-visual-icon">star_rate</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HERO БЛОК 8 - Картинка слева, текст справа (CTA) -->
+    <section class="hero-section alt cta-section">
+      <div class="hero-container reverse">
+        <div class="hero-visual">
+          <div class="hero-visual-card">
+            <div class="hero-visual-inner">
+              <span class="material-symbols-outlined hero-visual-icon">rocket_launch</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-content">
+          <h2 class="hero-title-large" data-t="cta_title">Готов начать свой путь в IT?</h2>
+          <p class="hero-description" data-t="cta_text">Присоединяйся к тысячам студентов, которые уже учатся на платформе Эврика</p>
+          <div class="hero-buttons">
+            <button class="btn-primary lg" onclick="showPage('courses')" data-t="cta_button">Начать бесплатно</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </div>
 </div>
-
-<!-- COURSE DETAIL PAGE -->
-<div id="page-course-detail" class="page">
-  <div class="courses-page">
-    <div class="section-inner" id="course-detail-container"></div>
-  </div>
-</div>
-
-<!-- LESSON DETAIL PAGE -->
-<div id="page-lesson-detail" class="page">
-  <div class="courses-page">
-    <div class="section-inner" id="lesson-detail-container"></div>
-  </div>
-</div>
-
-<!-- PROFILE PAGE -->
-<div id="page-profile" class="page">
-  <div class="profile-page">
-    <div class="profile-inner" id="profile-container"></div>
-  </div>
-</div>
-
-<!-- MOBILE BOTTOM NAV -->
-<nav class="mobile-nav">
-  <div class="mobile-nav-inner">
-    <button class="mobile-nav-btn" data-page="landing" onclick="showPage('landing')">
-      <span class="material-symbols-outlined">school</span>
-      <span data-t="mobile_home">Главная</span>
-    </button>
-    <button class="mobile-nav-btn" data-page="courses" onclick="showPage('courses')">
-      <span class="material-symbols-outlined">menu_book</span>
-      <span data-t="mobile_courses">Курсы</span>
-    </button>
-    <button class="mobile-nav-btn" data-page="profile" onclick="showPage('profile')">
-      <span class="material-symbols-outlined">account_circle</span>
-      <span data-t="mobile_profile">Профиль</span>
-    </button>
-  </div>
-</nav>
-
-<!-- SCRIPTS -->
-<script src="js/firebase-config.js"></script>
-<script src="js/themes.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/courses.js"></script>
-<script src="js/lessons.js"></script>
-<script src="js/profile.js"></script>
-<script src="js/app.js"></script>
-
-</body>
-</html>
