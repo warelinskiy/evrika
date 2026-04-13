@@ -8,33 +8,127 @@ let currentCourse = null;
 const demoCourse = {
   id: 'java-basic',
   title: 'Java с нуля до профессионала',
-  description: 'Полный курс по Java с нуля до уверенного уровня. 18 уроков, практические задания, 30 тестов.',
+  description: 'Полный курс по Java с нуля до уверенного уровня. 18 уроков, практические задания.',
   icon: '💻',
   lessons: 18,
   duration: '36 часов',
   level: 'Начинающий',
-  author: 'Эврика',
-  visibility: 'public'
+  author: 'Эврика'
 };
 
 async function loadCourses() {
-  try {
-    const snapshot = await db.collection('courses').where('visibility', 'in', ['public', 'link']).get();
-    courses = [];
-    snapshot.forEach(doc => {
-      courses.push({ id: doc.id, ...doc.data() });
-    });
-    if (courses.length === 0) courses = [demoCourse];
-    renderCourses();
-  } catch (error) {
-    console.error('Ошибка загрузки курсов:', error);
-    courses = [demoCourse];
-    renderCourses();
-  }
+  const container = document.getElementById('courses-container');
+  if (!container) return;
+  
+  courses = [demoCourse];
+  
+  container.innerHTML = courses.map(course => `
+    <div class="course-card" onclick="selectCourse('${course.id}')">
+      <div class="course-card-header">
+        <div class="course-card-header-icon">${course.icon}</div>
+        <h3 class="course-card-title">${course.title}</h3>
+        <p class="course-card-meta">${course.level} • ${course.duration}</p>
+      </div>
+      <div class="course-card-body">
+        <p class="course-card-description">${course.description}</p>
+        <div class="course-card-stats">
+          <span>📖 ${course.lessons} уроков</span>
+          <span>👤 ${course.author}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
 }
 
-function renderCourses() {
-  const container = document.getElementById('courses-container');
+window.selectCourse = function(courseId) {
+  currentCourse = demoCourse;
+  const container = document.getElementById('course-detail-container');
+  if (!container) return;
+  
+  const completedLessons = window.userProgress?.completedLessons || [];
+  const lessonsList = getLessonsList();
+  
+  container.innerHTML = `
+    <div class="mb-4"><button class="btn-secondary" onclick="showPage('courses')">← Назад к курсам</button></div>
+    <div style="margin-bottom: 2rem;">
+      <div style="font-size: 4rem;">${currentCourse.icon}</div>
+      <h1 class="section-title">${currentCourse.title}</h1>
+      <p style="color: var(--on-surface-variant);">${currentCourse.description}</p>
+    </div>
+    <div class="lessons-list">
+      ${lessonsList.map((lesson, idx) => {
+        const isCompleted = completedLessons.includes(lesson.id);
+        return `
+          <div class="lesson-item" onclick="startLesson('${lesson.id}')">
+            <div class="lesson-left">
+              <div class="lesson-number">${idx + 1}</div>
+              <div>
+                <div class="lesson-title">${lesson.title}</div>
+                <div class="lesson-duration">${lesson.duration}</div>
+              </div>
+            </div>
+            <div class="lesson-status ${isCompleted ? 'completed' : ''}">
+              ${isCompleted ? '✓ Пройден' : '▶ Начать'}
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+  showPage('course-detail');
+};
+
+function getLessonsList() {
+  return [
+    { id: 'lesson-1', title: 'Введение в Java', duration: '2 часа' },
+    { id: 'lesson-2', title: 'Переменные и примитивные типы', duration: '2 часа' },
+    { id: 'lesson-3', title: 'Операторы в Java', duration: '2 часа' },
+    { id: 'lesson-4', title: 'Условные операторы и циклы', duration: '2 часа' },
+    { id: 'lesson-5', title: 'Массивы', duration: '2 часа' },
+    { id: 'lesson-6', title: 'Строки', duration: '2 часа' },
+    { id: 'lesson-7', title: 'Методы', duration: '2 часа' },
+    { id: 'lesson-8', title: 'Классы и объекты', duration: '2 часа' },
+    { id: 'lesson-9', title: 'Наследование', duration: '2 часа' },
+    { id: 'lesson-10', title: 'Абстрактные классы', duration: '2 часа' },
+    { id: 'lesson-11', title: 'Исключения', duration: '2 часа' },
+    { id: 'lesson-12', title: 'Generics', duration: '2 часа' },
+    { id: 'lesson-13', title: 'Коллекции', duration: '2 часа' },
+    { id: 'lesson-14', title: 'Stream API', duration: '2 часа' },
+    { id: 'lesson-15', title: 'Многопоточность', duration: '2 часа' },
+    { id: 'lesson-16', title: 'Дата и время', duration: '2 часа' },
+    { id: 'lesson-17', title: 'Ввод-вывод', duration: '2 часа' },
+    { id: 'lesson-18', title: 'Аннотации', duration: '2 часа' }
+  ];
+}
+
+window.openCreateCourseModal = function() {
+  if (!currentUser) {
+    openAuthModal();
+    return;
+  }
+  const modal = document.getElementById('create-course-modal');
+  if (modal) modal.classList.add('active');
+};
+
+window.closeCreateCourseModal = function() {
+  const modal = document.getElementById('create-course-modal');
+  if (modal) modal.classList.remove('active');
+};
+
+window.setVisibility = function(value) {
+  document.querySelectorAll('.visibility-option').forEach(opt => {
+    opt.classList.toggle('selected', opt.dataset.value === value);
+  });
+  const visibilityInput = document.getElementById('course-visibility');
+  if (visibilityInput) visibilityInput.value = value;
+};
+
+// Инициализация
+document.addEventListener('DOMContentLoaded', () => {
+  const createCourseBtn = document.getElementById('create-course-btn');
+  if (createCourseBtn) createCourseBtn.addEventListener('click', openCreateCourseModal);
+  loadCourses();
+});  const container = document.getElementById('courses-container');
   if (!container) return;
   
   container.innerHTML = courses.map(course => `
