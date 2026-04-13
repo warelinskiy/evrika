@@ -23,8 +23,8 @@
       <span>Эврика</span>
     </div>
     <div class="nav-links">
-      <button class="nav-link" onclick="showPage('landing')" data-translate="nav_home">Главная</button>
-      <button class="nav-link" onclick="showPage('profile')" data-translate="nav_profile">Профиль</button>
+      <button class="nav-link" onclick="showPage('landing')">Главная</button>
+      <button class="nav-link" onclick="showPage('profile')">Профиль</button>
     </div>
     <div class="nav-actions">
       <div class="theme-toggle">
@@ -41,7 +41,7 @@
         <button class="lang-btn active" data-lang="ru" onclick="setLanguage('ru')">RU</button>
         <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">EN</button>
       </div>
-      <div id="auth-container"><button class="btn-secondary" id="auth-trigger-btn" data-translate="login">Войти</button></div>
+      <div id="auth-container"><button class="btn-secondary" id="auth-trigger-btn">Войти</button></div>
       <div id="user-menu" class="user-menu" style="display:none;">
         <div class="user-avatar" id="user-avatar"></div>
         <span id="user-name"></span>
@@ -51,10 +51,60 @@
   </div>
 </nav>
 
-<!-- МОДАЛЬНЫЕ ОКНА -->
-
-<!-- Авторизация -->
-<div id="auth-modal" class="modal-overlay">...</div>
+<!-- ========== МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ (ПОЛНОСТЬЮ ВОССТАНОВЛЕНО) ========== -->
+<div id="auth-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Добро пожаловать</h2>
+      <button class="modal-close" onclick="closeAuthModal()">&times;</button>
+    </div>
+    <div id="auth-error" class="auth-error" style="display:none;"></div>
+    
+    <!-- Форма входа -->
+    <div id="login-form">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" id="login-username" class="form-input" placeholder="example@mail.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Пароль</label>
+        <input type="password" id="login-password" class="form-input" placeholder="••••••">
+      </div>
+      <button id="login-submit" class="btn-primary" style="width:100%">Войти</button>
+      <p style="text-align:center; margin-top:1rem;">
+        <button onclick="showRegisterForm()" style="background:none; border:none; color:var(--primary); cursor:pointer;">Нет аккаунта? Зарегистрироваться</button>
+      </p>
+    </div>
+    
+    <!-- Форма регистрации -->
+    <div id="register-form" style="display:none;">
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input type="text" id="register-username" class="form-input" placeholder="username">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Имя</label>
+        <input type="text" id="register-name" class="form-input" placeholder="Ваше имя">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" id="register-email" class="form-input" placeholder="example@mail.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Пароль</label>
+        <input type="password" id="register-password" class="form-input" placeholder="минимум 6 символов">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Аватар</label>
+        <div class="avatar-emoji-grid" id="avatar-emoji-grid"></div>
+      </div>
+      <button id="register-submit" class="btn-primary" style="width:100%">Зарегистрироваться</button>
+      <p style="text-align:center; margin-top:1rem;">
+        <button onclick="showLoginForm()" style="background:none; border:none; color:var(--primary); cursor:pointer;">Уже есть аккаунт? Войти</button>
+      </p>
+    </div>
+  </div>
+</div>
 
 <!-- Выбор аватара -->
 <div id="avatar-modal" class="modal-overlay">
@@ -100,94 +150,189 @@
 <div id="page-landing" class="page active">
   <div class="landing-wrap">
     
-    <!-- БЛОК 1 - Главный (текст слева, картинка справа) -->
+    <!-- БЛОК 1 - Главный -->
     <section class="hero-section">
       <div class="hero-container">
         <div class="hero-content">
           <div class="hero-badge"><span class="hero-badge-dot"></span><span>Онлайн платформа обучения</span></div>
           <h1 class="hero-title">Учись Java бесплатно в интерактивной игровой системе</h1>
           <p class="hero-description">Осваивай программирование, создавай свои тесты и делись знаниями с другими.</p>
-          <div class="hero-buttons"><button class="btn-primary lg" onclick="showPage('profile')">Начать обучение</button><button class="btn-secondary lg" onclick="openAuthModal()">У меня уже есть аккаунт</button></div>
+          <div class="hero-buttons">
+            <button class="btn-primary lg" onclick="showPage('profile')">Начать обучение</button>
+            <button class="btn-secondary lg" onclick="openAuthModal()">У меня уже есть аккаунт</button>
+          </div>
         </div>
-        <div class="hero-visual"><div class="hero-visual-glow"></div><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">terminal</span></div></div></div>
+        <div class="hero-visual">
+          <div class="hero-visual-glow"></div>
+          <div class="hero-visual-card">
+            <div class="hero-visual-inner">
+              <span class="material-symbols-outlined hero-visual-icon">terminal</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- БЛОК 2 - Создавай и зарабатывай (картинка слева, текст справа) -->
+    <!-- БЛОК 2 - Создавай и зарабатывай -->
     <section class="hero-section alt">
       <div class="hero-container reverse">
-        <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">payments</span></div></div></div>
+        <div class="hero-visual">
+          <div class="hero-visual-card">
+            <div class="hero-visual-inner">
+              <span class="material-symbols-outlined hero-visual-icon">payments</span>
+            </div>
+          </div>
+        </div>
         <div class="hero-content">
           <h2 class="hero-title-small">Создавай и зарабатывай</h2>
           <p class="hero-description">Наша платформа позволяет не только учиться, но и становиться автором. Публикуйте свои тесты и получайте вознаграждение.</p>
-          <div class="hero-feature-card"><span class="material-symbols-outlined hero-feature-icon">payments</span><div><h4>Монетизируйте свои знания</h4><p>Зарабатывайте баллы и бонусы за популярные курсы</p></div></div>
+          <div class="hero-feature-card">
+            <span class="material-symbols-outlined hero-feature-icon">payments</span>
+            <div>
+              <h4>Монетизируйте свои знания</h4>
+              <p>Зарабатывайте баллы и бонусы за популярные курсы</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- БЛОК 3 - Научный подход (текст слева, картинка справа) - ИСПРАВЛЕН ТЕКСТ -->
+    <!-- БЛОК 3 - Научный подход -->
     <section class="hero-section">
       <div class="hero-container">
         <div class="hero-content">
           <h2 class="hero-title-small">Научный подход к обучению</h2>
           <p class="hero-description">В основе платформы — интеллектуальные алгоритмы интервального повторения и принципы когнитивной психологии, усиливающие запоминание и ускоряющие обучение.</p>
-          <div class="hero-stats-grid"><div class="hero-stat-compact"><span class="hero-stat-value">90%</span><br>Усвоение</div><div class="hero-stat-compact"><span class="hero-stat-value">3x</span><br>Быстрее</div><div class="hero-stat-compact"><span class="hero-stat-value">24/7</span><br>Доступно</div></div>
+          <div class="hero-stats-grid">
+            <div class="hero-stat-compact"><span class="hero-stat-value">90%</span><br>Усвоение</div>
+            <div class="hero-stat-compact"><span class="hero-stat-value">3x</span><br>Быстрее</div>
+            <div class="hero-stat-compact"><span class="hero-stat-value">24/7</span><br>Доступно</div>
+          </div>
         </div>
-        <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">psychology</span></div></div></div>
+        <div class="hero-visual">
+          <div class="hero-visual-card">
+            <div class="hero-visual-inner">
+              <span class="material-symbols-outlined hero-visual-icon">psychology</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- БЛОК 4 - Как проходит обучение (картинка слева, текст справа) -->
+    <!-- БЛОК 4 - Как проходит обучение -->
     <section class="hero-section alt">
       <div class="hero-container reverse">
-        <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">school</span></div></div></div>
+        <div class="hero-visual">
+          <div class="hero-visual-card">
+            <div class="hero-visual-inner">
+              <span class="material-symbols-outlined hero-visual-icon">school</span>
+            </div>
+          </div>
+        </div>
         <div class="hero-content">
           <h2 class="hero-title-small">Как проходит обучение</h2>
-          <div class="process-steps"><div class="process-step"><div class="step-number">1</div><div><h4>Учись</h4><p>Короткие и емкие уроки без воды</p></div></div><div class="process-step"><div class="step-number">2</div><div><h4>Тестируй</h4><p>Интерактивные тесты в реальном времени</p></div></div><div class="process-step"><div class="step-number">3</div><div><h4>Практикуй</h4><p>Решение живых задач по кодингу</p></div></div></div>
+          <div class="process-steps">
+            <div class="process-step"><div class="step-number">1</div><div><h4>Учись</h4><p>Короткие и емкие уроки без воды</p></div></div>
+            <div class="process-step"><div class="step-number">2</div><div><h4>Тестируй</h4><p>Интерактивные тесты в реальном времени</p></div></div>
+            <div class="process-step"><div class="step-number">3</div><div><h4>Практикуй</h4><p>Решение живых задач по кодингу</p></div></div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- БЛОК 5 - Глубокое понимание (текст слева, картинка справа) -->
+    <!-- БЛОК 5 - Глубокое понимание -->
     <section class="hero-section">
       <div class="hero-container">
-        <div class="hero-content"><h2 class="hero-title-small">Глубокое понимание вместо заучивания</h2><p class="hero-description">Мы верим, что программирование — это логика, а не синтаксис.</p><button class="btn-primary" onclick="showPage('profile')">Начать глубокое погружение</button></div>
-        <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">architecture</span></div></div></div>
+        <div class="hero-content">
+          <h2 class="hero-title-small">Глубокое понимание вместо заучивания</h2>
+          <p class="hero-description">Мы верим, что программирование — это логика, а не синтаксис.</p>
+          <button class="btn-primary" onclick="showPage('profile')">Начать глубокое погружение</button>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-visual-card">
+            <div class="hero-visual-inner">
+              <span class="material-symbols-outlined hero-visual-icon">architecture</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- БЛОК 6 - Обучение без давления (картинка слева, текст справа) -->
+    <!-- БЛОК 6 - Обучение без давления -->
     <section class="hero-section alt">
       <div class="hero-container reverse">
-        <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">schedule</span></div></div></div>
+        <div class="hero-visual">
+          <div class="hero-visual-card">
+            <div class="hero-visual-inner">
+              <span class="material-symbols-outlined hero-visual-icon">schedule</span>
+            </div>
+          </div>
+        </div>
         <div class="hero-content">
           <h2 class="hero-title-small">Обучение без давления</h2>
           <p class="hero-description">Никаких обязательных вебинаров или расписаний. Учитесь в своем темпе 24/7.</p>
-          <div class="features-grid-compact"><div class="feature-compact"><span class="material-symbols-outlined">schedule</span><span>Свободный график</span></div><div class="feature-compact"><span class="material-symbols-outlined">devices</span><span>Любое устройство</span></div><div class="feature-compact"><span class="material-symbols-outlined">trending_up</span><span>Свой темп</span></div><div class="feature-compact"><span class="material-symbols-outlined">psychology</span><span>Без дедлайнов</span></div></div>
+          <div class="features-grid-compact">
+            <div class="feature-compact"><span class="material-symbols-outlined">schedule</span><span>Свободный график</span></div>
+            <div class="feature-compact"><span class="material-symbols-outlined">devices</span><span>Любое устройство</span></div>
+            <div class="feature-compact"><span class="material-symbols-outlined">trending_up</span><span>Свой темп</span></div>
+            <div class="feature-compact"><span class="material-symbols-outlined">psychology</span><span>Без дедлайнов</span></div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- БЛОК 7 - Наши советы (вместо отзывов) -->
+    <!-- БЛОК 7 - Наши советы -->
     <section class="hero-section">
       <div class="hero-container">
         <div class="hero-content">
           <h2 class="hero-title-small">Наши советы</h2>
-          <div class="testimonial-card"><div class="testimonial-avatar">👨‍💻</div><div><p class="testimonial-text">Учись регулярно, а не долго</p><p class="testimonial-author">Даже 20–30 минут в день дают лучший результат, чем редкие многочасовые занятия.</p></div></div>
-          <div class="testimonial-card"><div class="testimonial-avatar">👩‍💻</div><div><p class="testimonial-text">Практика — ключ к навыку</p><p class="testimonial-author">Старайся применять знания сразу: решай задачи, пиши код, проходи тесты.</p></div></div>
-          <div class="testimonial-card"><div class="testimonial-avatar">🧠</div><div><p class="testimonial-text">Повторение = запоминание</p><p class="testimonial-author">Возвращайся к пройденному материалу, чтобы закрепить его надолго.</p></div></div>
+          <div class="testimonial-card">
+            <div class="testimonial-avatar">👨‍💻</div>
+            <div>
+              <p class="testimonial-text">Учись регулярно, а не долго</p>
+              <p class="testimonial-author">Даже 20–30 минут в день дают лучший результат, чем редкие многочасовые занятия.</p>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-avatar">👩‍💻</div>
+            <div>
+              <p class="testimonial-text">Практика — ключ к навыку</p>
+              <p class="testimonial-author">Старайся применять знания сразу: решай задачи, пиши код, проходи тесты.</p>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-avatar">🧠</div>
+            <div>
+              <p class="testimonial-text">Повторение = запоминание</p>
+              <p class="testimonial-author">Возвращайся к пройденному материалу, чтобы закрепить его надолго.</p>
+            </div>
+          </div>
         </div>
-        <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">tips_and_updates</span></div></div></div>
+        <div class="hero-visual">
+          <div class="hero-visual-card">
+            <div class="hero-visual-inner">
+              <span class="material-symbols-outlined hero-visual-icon">tips_and_updates</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- БЛОК 8 - CTA (исправлен текст) -->
+    <!-- БЛОК 8 - CTA -->
     <section class="hero-section alt cta-section">
       <div class="hero-container reverse">
-        <div class="hero-visual"><div class="hero-visual-card"><div class="hero-visual-inner"><span class="material-symbols-outlined hero-visual-icon">rocket_launch</span></div></div></div>
+        <div class="hero-visual">
+          <div class="hero-visual-card">
+            <div class="hero-visual-inner">
+              <span class="material-symbols-outlined hero-visual-icon">rocket_launch</span>
+            </div>
+          </div>
+        </div>
         <div class="hero-content">
           <h2 class="hero-title-large">Стань одним из первых пользователей и расти вместе с платформой</h2>
-          <div class="hero-buttons"><button class="btn-primary lg" onclick="showPage('profile')">Начать бесплатно</button></div>
+          <div class="hero-buttons">
+            <button class="btn-primary lg" onclick="showPage('profile')">Начать бесплатно</button>
+          </div>
         </div>
       </div>
     </section>
@@ -211,7 +356,7 @@
 </nav>
 
 <script>
-  // Темы
+  // ========== ТЕМЫ ==========
   window.setTheme = function(theme) {
     document.body.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
@@ -219,31 +364,41 @@
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme) document.body.setAttribute('data-theme', savedTheme);
   
-  // Уведомления
+  // ========== УВЕДОМЛЕНИЯ ==========
   window.showNotification = function(msg, type = 'info') {
     const colors = { success: '#10b981', error: '#ef4444', info: '#3b82f6' };
     const div = document.createElement('div');
-    div.style.cssText = `position:fixed; bottom:20px; right:20px; padding:12px 24px; background:${colors[type]}; color:white; border-radius:12px; z-index:10000; animation:slideIn 0.3s ease;`;
+    div.style.cssText = `position:fixed; bottom:20px; right:20px; padding:12px 24px; background:${colors[type]}; color:white; border-radius:12px; z-index:10000; animation:slideIn 0.3s ease; font-size:14px;`;
     div.textContent = msg;
     document.body.appendChild(div);
     setTimeout(() => div.remove(), 3000);
   };
   
-  // Переключение страниц
+  // ========== ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ ==========
   window.showPage = function(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const target = document.getElementById(`page-${pageId}`);
     if (target) target.classList.add('active');
     if (pageId === 'profile' && typeof renderProfilePage === 'function') renderProfilePage();
-    window.scrollTo({ top: 0 });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   
-  // Анимация
-  const style = document.createElement('style');
-  style.textContent = `@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }`;
-  document.head.appendChild(style);
+  // ========== ЯЗЫКИ ==========
+  window.setLanguage = function(lang) {
+    localStorage.setItem('language', lang);
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+  };
+  const savedLang = localStorage.getItem('language');
+  if (savedLang) setLanguage(savedLang);
   
-  // Инициализация
+  // ========== АНИМАЦИЯ ==========
+  const animStyle = document.createElement('style');
+  animStyle.textContent = `@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }`;
+  document.head.appendChild(animStyle);
+  
+  // ========== ИНИЦИАЛИЗАЦИЯ ==========
   document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Приложение загружено');
     showPage('landing');
