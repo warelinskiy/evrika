@@ -29,20 +29,28 @@ function showError(msg) {
   if (errDiv) {
     errDiv.textContent = msg;
     errDiv.style.display = 'block';
-    setTimeout(() => errDiv.style.display = 'none', 3000);
+    setTimeout(() => {
+      if (errDiv) errDiv.style.display = 'none';
+    }, 3000);
+  } else {
+    alert(msg);
   }
 }
 
 window.showLoginForm = function() {
-  document.getElementById('login-form').style.display = 'block';
-  document.getElementById('register-form').style.display = 'none';
+  const loginForm = document.getElementById('login-form');
+  const registerForm = document.getElementById('register-form');
+  if (loginForm) loginForm.style.display = 'block';
+  if (registerForm) registerForm.style.display = 'none';
   const errDiv = document.getElementById('auth-error');
   if (errDiv) errDiv.style.display = 'none';
 };
 
 window.showRegisterForm = function() {
-  document.getElementById('login-form').style.display = 'none';
-  document.getElementById('register-form').style.display = 'block';
+  const loginForm = document.getElementById('login-form');
+  const registerForm = document.getElementById('register-form');
+  if (loginForm) loginForm.style.display = 'none';
+  if (registerForm) registerForm.style.display = 'block';
   renderAvatarGrid();
   const errDiv = document.getElementById('auth-error');
   if (errDiv) errDiv.style.display = 'none';
@@ -60,7 +68,8 @@ window.closeAuthModal = function() {
   const modal = document.getElementById('auth-modal');
   if (modal) {
     modal.classList.remove('active');
-    document.querySelectorAll('#auth-modal input').forEach(i => i.value = '');
+    const inputs = modal.querySelectorAll('input');
+    inputs.forEach(i => i.value = '');
   }
 };
 
@@ -77,9 +86,15 @@ window.login = async function() {
   if (!input.includes('@')) {
     try {
       const users = await db.collection('users').where('username', '==', input.toLowerCase()).get();
-      if (users.empty) { showError('Пользователь не найден'); return; }
+      if (users.empty) { 
+        showError('Пользователь не найден'); 
+        return; 
+      }
       email = users.docs[0].data().email;
-    } catch(e) { showError('Ошибка поиска'); return; }
+    } catch(e) { 
+      showError('Ошибка поиска'); 
+      return; 
+    }
   }
   
   try {
@@ -88,10 +103,15 @@ window.login = async function() {
     await loadUserData(currentUser.uid);
     updateUI();
     closeAuthModal();
-    if (typeof showNotification === 'function') showNotification(`Добро пожаловать!`, 'success');
+    if (typeof showNotification === 'function') {
+      showNotification(`Добро пожаловать!`, 'success');
+    }
+    console.log('✅ Вход выполнен:', currentUser.email);
   } catch(e) {
+    console.error(e);
     if (e.code === 'auth/user-not-found') showError('Пользователь не найден');
     else if (e.code === 'auth/wrong-password') showError('Неверный пароль');
+    else if (e.code === 'auth/invalid-email') showError('Неверный email');
     else showError('Ошибка: ' + e.message);
   }
 };
@@ -119,8 +139,13 @@ window.register = async function() {
   
   try {
     const existing = await db.collection('users').where('username', '==', username.toLowerCase()).get();
-    if (!existing.empty) { showError('Username уже занят'); return; }
-  } catch(e) {}
+    if (!existing.empty) { 
+      showError('Username уже занят'); 
+      return; 
+    }
+  } catch(e) {
+    console.error(e);
+  }
   
   try {
     const userCred = await auth.createUserWithEmailAndPassword(email, password);
@@ -138,12 +163,24 @@ window.register = async function() {
     });
     
     currentUser = userCred.user;
-    window.userData = { username, name, email, avatar: selectedAvatar, completedLessons: [] };
+    window.userData = { 
+      uid: currentUser.uid,
+      username: username.toLowerCase(), 
+      name: name, 
+      email: email, 
+      avatar: selectedAvatar, 
+      completedLessons: [] 
+    };
     updateUI();
     closeAuthModal();
-    if (typeof showNotification === 'function') showNotification('Регистрация успешна!', 'success');
+    if (typeof showNotification === 'function') {
+      showNotification('Регистрация успешна!', 'success');
+    }
+    console.log('✅ Регистрация выполнена:', username);
   } catch(e) {
+    console.error(e);
     if (e.code === 'auth/email-already-in-use') showError('Email уже используется');
+    else if (e.code === 'auth/weak-password') showError('Слишком слабый пароль');
     else showError('Ошибка: ' + e.message);
   }
 };
@@ -154,17 +191,27 @@ async function loadUserData(uid) {
     if (doc.exists) {
       window.userData = doc.data();
       window.userProgress = { completedLessons: window.userData.completedLessons || [] };
+      console.log('✅ Данные пользователя загружены');
+      return true;
     }
-  } catch(e) { console.error(e); }
+  } catch(e) { 
+    console.error('Ошибка загрузки данных:', e);
+  }
+  return false;
 }
 
 window.logout = async function() {
-  await auth.signOut();
-  currentUser = null;
-  window.userData = null;
-  updateUI();
-  if (typeof showPage === 'function') showPage('landing');
-  if (typeof showNotification === 'function') showNotification('Вы вышли', 'info');
+  try {
+    await auth.signOut();
+    currentUser = null;
+    window.userData = null;
+    updateUI();
+    if (typeof showPage === 'function') showPage('landing');
+    if (typeof showNotification === 'function') showNotification('Вы вышли из аккаунта', 'info');
+    console.log('👋 Выход выполнен');
+  } catch(e) {
+    console.error(e);
+  }
 };
 
 function updateUI() {
@@ -185,7 +232,9 @@ function updateUI() {
   }
 }
 
+// Слушатель авторизации
 auth.onAuthStateChanged(async (user) => {
+  console.log('🔐 Auth state changed:', user ? `Пользователь ${user.email}` : 'Нет пользователя');
   currentUser = user;
   if (user) {
     await loadUserData(user.uid);
@@ -195,20 +244,34 @@ auth.onAuthStateChanged(async (user) => {
   }
 });
 
+// Инициализация
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('🔐 Инициализация auth.js');
+  
   const trigger = document.getElementById('auth-trigger-btn');
   if (trigger) trigger.addEventListener('click', openAuthModal);
   
-  document.getElementById('login-submit')?.addEventListener('click', login);
-  document.getElementById('register-submit')?.addEventListener('click', register);
+  const loginSubmit = document.getElementById('login-submit');
+  if (loginSubmit) loginSubmit.addEventListener('click', login);
   
-  document.getElementById('auth-modal')?.addEventListener('click', (e) => {
-    if (e.target === document.getElementById('auth-modal')) closeAuthModal();
-  });
+  const registerSubmit = document.getElementById('register-submit');
+  if (registerSubmit) registerSubmit.addEventListener('click', register);
   
-  document.getElementById('user-avatar')?.addEventListener('click', () => {
-    if (currentUser && typeof showPage === 'function') showPage('profile');
-  });
+  const modal = document.getElementById('auth-modal');
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeAuthModal();
+    });
+  }
+  
+  const userAvatar = document.getElementById('user-avatar');
+  if (userAvatar) {
+    userAvatar.addEventListener('click', () => {
+      if (currentUser && typeof showPage === 'function') showPage('profile');
+    });
+  }
   
   renderAvatarGrid();
 });
+
+console.log('🔐 auth.js загружен');
