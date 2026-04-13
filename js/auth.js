@@ -3,6 +3,28 @@
 // ============================================
 
 let currentUser = null;
+let selectedAvatar = '🐱';
+
+// Список эмодзи животных
+const animalEmojis = ['🐱', '🐶', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐟', '🐠', '🐡', '🐙', '🦑', '🐬', '🐳', '🐋', '🦈', '🦭', '🐊', '🐉', '🦕', '🦖'];
+
+function renderAvatarGrid() {
+  const grid = document.getElementById('avatar-emoji-grid');
+  if (!grid) return;
+  
+  grid.innerHTML = animalEmojis.map(emoji => `
+    <div class="avatar-emoji ${selectedAvatar === emoji ? 'selected' : ''}" data-emoji="${emoji}" onclick="selectAvatar('${emoji}')">
+      ${emoji}
+    </div>
+  `).join('');
+}
+
+window.selectAvatar = function(emoji) {
+  selectedAvatar = emoji;
+  document.querySelectorAll('.avatar-emoji').forEach(el => {
+    el.classList.toggle('selected', el.dataset.emoji === emoji);
+  });
+};
 
 function showError(message) {
   const errorDiv = document.getElementById('auth-error');
@@ -20,12 +42,13 @@ function showLoginForm() {
   if (registerForm) registerForm.style.display = 'none';
 }
 
-function showRegisterForm() {
+window.showRegisterForm = function() {
   const loginForm = document.getElementById('login-form');
   const registerForm = document.getElementById('register-form');
   if (loginForm) loginForm.style.display = 'none';
   if (registerForm) registerForm.style.display = 'block';
-}
+  renderAvatarGrid();
+};
 
 function openAuthModal() {
   const modal = document.getElementById('auth-modal');
@@ -35,28 +58,46 @@ function openAuthModal() {
   }
 }
 
-function closeAuthModal() {
+window.closeAuthModal = function() {
   const modal = document.getElementById('auth-modal');
   if (modal) {
     modal.classList.remove('active');
     const inputs = modal.querySelectorAll('input');
     inputs.forEach(input => input.value = '');
   }
-}
+};
 
 async function login() {
-  const email = document.getElementById('login-email')?.value;
+  const loginInput = document.getElementById('login-username')?.value;
   const password = document.getElementById('login-password')?.value;
   
-  if (!email || !password) {
+  if (!loginInput || !password) {
     showError('Заполните все поля');
     return;
+  }
+  
+  // Проверяем, является ли ввод email'ом или username'ом
+  let email = loginInput;
+  if (!loginInput.includes('@')) {
+    // Это username, нужно найти email
+    try {
+      const usersSnapshot = await db.collection('users').where('username', '==', loginInput.toLowerCase()).get();
+      if (usersSnapshot.empty) {
+        showError('Пользователь не найден');
+        return;
+      }
+      email = usersSnapshot.docs[0].data().email;
+    } catch (error) {
+      showError('Ошибка поиска пользователя');
+      return;
+    }
   }
   
   try {
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     currentUser = userCredential.user;
-    updateUIForLoggedInUser(currentUser);
+    await loadUserData(currentUser.uid);
+    updateUIForLoggedInUser();
     closeAuthModal();
   } catch (error) {
     console.error('Ошибка входа:', error);
@@ -68,33 +109,61 @@ async function login() {
 }
 
 async function register() {
+  const username = document.getElementById('register-username')?.value;
   const name = document.getElementById('register-name')?.value;
   const email = document.getElementById('register-email')?.value;
   const password = document.getElementById('register-password')?.value;
   
-  if (!name || !email || !password) {
+  if (!username || !name || !email || !password) {
     showError('Заполните все поля');
     return;
   }
+  
+  // Проверка username (только буквы, цифры, подчеркивание)
+  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+  if (!usernameRegex.test(username)) {
+    showError('Username должен содержать 3-20 символов (буквы, цифры, _)');
+    return;
+  }
+  
   if (password.length < 6) {
     showError('Пароль должен быть не менее 6 символов');
     return;
+  }
+  
+  // Проверяем уникальность username
+  try {
+    const existingUser = await db.collection('users').where('username', '==', username.toLowerCase()).get();
+    if (!existingUser.empty) {
+      showError('Этот username уже занят');
+      return;
+    }
+  } catch (error) {
+    console.error('Ошибка проверки username:', error);
   }
   
   try {
     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
     await userCredential.user.updateProfile({ displayName: name });
     
+    // Сохраняем данные пользователя
     await db.collection('users').doc(userCredential.user.uid).set({
+      uid: userCredential.user.uid,
+      username: username.toLowerCase(),
       name: name,
       email: email,
+      avatar: selectedAvatar,
+      bio: '',
+      location: '',
+      website: '',
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       completedLessons: [],
       courseProgress: {}
     });
     
     currentUser = userCredential.user;
-    updateUIForLoggedInUser(currentUser);
+    await loadUserData(currentUser.uid);
+    updateUIForLoggedInUser();
     closeAuthModal();
   } catch (error) {
     console.error('Ошибка регистрации:', error);
@@ -104,10 +173,27 @@ async function register() {
   }
 }
 
+async function loadUserData(uid) {
+  try {
+    const userDoc = await db.collection('users').doc(uid).get();
+    if (userDoc.exists) {
+      window.userData = userDoc.data();
+      window.userProgress = {
+        completedLessons: window.userData.completedLessons || [],
+        courseProgress: window.userData.courseProgress || {}
+      };
+    }
+  } catch (error) {
+    console.error('Ошибка загрузки данных:', error);
+  }
+}
+
 async function logout() {
   try {
     await auth.signOut();
     currentUser = null;
+    window.userData = null;
+    window.userProgress = null;
     updateUIForLoggedOutUser();
     showPage('landing');
   } catch (error) {
@@ -115,19 +201,20 @@ async function logout() {
   }
 }
 
-function updateUIForLoggedInUser(user) {
+function updateUIForLoggedInUser() {
   const authContainer = document.getElementById('auth-container');
   const userMenu = document.getElementById('user-menu');
   const userName = document.getElementById('user-name');
   const userAvatar = document.getElementById('user-avatar');
   
-  if (user) {
-    const displayName = user.displayName || user.email.split('@')[0];
+  if (currentUser && window.userData) {
+    const displayName = window.userData.name || currentUser.displayName || currentUser.email.split('@')[0];
     if (userName) userName.textContent = displayName;
-    if (userAvatar) userAvatar.textContent = displayName.charAt(0).toUpperCase();
+    if (userAvatar) userAvatar.textContent = window.userData.avatar || '👤';
     if (authContainer) authContainer.style.display = 'none';
     if (userMenu) userMenu.style.display = 'flex';
-    loadUserProgress();
+    updateProgressDisplay();
+    if (typeof renderProfile === 'function') renderProfile();
   }
 }
 
@@ -136,20 +223,6 @@ function updateUIForLoggedOutUser() {
   const userMenu = document.getElementById('user-menu');
   if (authContainer) authContainer.style.display = 'flex';
   if (userMenu) userMenu.style.display = 'none';
-  window.userProgress = null;
-}
-
-async function loadUserProgress() {
-  if (!currentUser) return;
-  try {
-    const userDoc = await db.collection('users').doc(currentUser.uid).get();
-    if (userDoc.exists) {
-      window.userProgress = userDoc.data();
-      updateProgressDisplay();
-    }
-  } catch (error) {
-    console.error('Ошибка загрузки прогресса:', error);
-  }
 }
 
 async function saveProgress(courseId, lessonId) {
@@ -188,10 +261,11 @@ function updateProgressDisplay() {
 }
 
 // Инициализация слушателя авторизации
-auth.onAuthStateChanged((user) => {
+auth.onAuthStateChanged(async (user) => {
   currentUser = user;
   if (user) {
-    updateUIForLoggedInUser(user);
+    await loadUserData(user.uid);
+    updateUIForLoggedInUser();
   } else {
     updateUIForLoggedOutUser();
   }
@@ -214,4 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.target === modal) closeAuthModal();
     });
   }
+  
+  renderAvatarGrid();
 });
