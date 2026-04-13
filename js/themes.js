@@ -4,11 +4,11 @@
 
 const themes = ['light', 'dark', 'sunset', 'ocean', 'lavender'];
 
-function setTheme(themeName) {
+window.setTheme = function(themeName) {
   if (!themes.includes(themeName)) return;
   document.body.setAttribute('data-theme', themeName);
   localStorage.setItem('eureka-theme', themeName);
-}
+};
 
 function getCurrentTheme() {
   return document.body.getAttribute('data-theme') || 'light';
