@@ -1,11 +1,11 @@
 // ============================================
-// МОДУЛЬ АВТОРИЗАЦИИ
+// МОДУЛЬ АВТОРИЗАЦИИ (ПРОСТАЯ ВЕРСИЯ)
 // ============================================
 
 let currentUser = null;
 let selectedAvatar = '🐱';
 
-const animalEmojis = ['🐱', '🐶', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐴', '🦄'];
+const animalEmojis = ['🐱', '🐶', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵'];
 
 function renderAvatarGrid() {
   const grid = document.getElementById('avatar-emoji-grid');
@@ -68,51 +68,60 @@ window.closeAuthModal = function() {
   const modal = document.getElementById('auth-modal');
   if (modal) {
     modal.classList.remove('active');
-    const inputs = modal.querySelectorAll('input');
-    inputs.forEach(i => i.value = '');
   }
 };
 
 window.login = async function() {
-  const input = document.getElementById('login-username')?.value.trim();
+  const emailInput = document.getElementById('login-username')?.value.trim();
   const password = document.getElementById('login-password')?.value;
   
-  if (!input || !password) {
+  if (!emailInput || !password) {
     showError('Заполните все поля');
     return;
   }
   
-  let email = input;
-  if (!input.includes('@')) {
-    try {
-      const users = await db.collection('users').where('username', '==', input.toLowerCase()).get();
-      if (users.empty) { 
-        showError('Пользователь не найден'); 
-        return; 
-      }
-      email = users.docs[0].data().email;
-    } catch(e) { 
-      showError('Ошибка поиска'); 
-      return; 
-    }
+  // Показываем загрузку
+  const loginBtn = document.getElementById('login-submit');
+  const originalText = loginBtn?.textContent;
+  if (loginBtn) {
+    loginBtn.textContent = '⏳ Вход...';
+    loginBtn.disabled = true;
   }
   
   try {
-    const user = await auth.signInWithEmailAndPassword(email, password);
-    currentUser = user.user;
-    await loadUserData(currentUser.uid);
-    updateUI();
-    closeAuthModal();
-    if (typeof showNotification === 'function') {
-      showNotification(`Добро пожаловать!`, 'success');
+    const userCredential = await auth.signInWithEmailAndPassword(emailInput, password);
+    currentUser = userCredential.user;
+    
+    // Загружаем данные пользователя
+    const userDoc = await db.collection('users').doc(currentUser.uid).get();
+    if (userDoc.exists) {
+      window.userData = userDoc.data();
+      window.userProgress = { completedLessons: window.userData.completedLessons || [] };
+    } else {
+      window.userData = { uid: currentUser.uid, email: currentUser.email, name: currentUser.displayName || 'Пользователь', completedLessons: [] };
     }
+    
+    // Обновляем UI
+    updateUIAfterLogin();
+    closeAuthModal();
+    
+    if (typeof showNotification === 'function') {
+      showNotification(`Добро пожаловать, ${window.userData.name || currentUser.email}!`, 'success');
+    }
+    
     console.log('✅ Вход выполнен:', currentUser.email);
-  } catch(e) {
-    console.error(e);
-    if (e.code === 'auth/user-not-found') showError('Пользователь не найден');
-    else if (e.code === 'auth/wrong-password') showError('Неверный пароль');
-    else if (e.code === 'auth/invalid-email') showError('Неверный email');
-    else showError('Ошибка: ' + e.message);
+    
+  } catch(error) {
+    console.error('Ошибка входа:', error);
+    if (error.code === 'auth/user-not-found') showError('Пользователь не найден');
+    else if (error.code === 'auth/wrong-password') showError('Неверный пароль');
+    else if (error.code === 'auth/invalid-email') showError('Неверный email');
+    else showError('Ошибка: ' + error.message);
+  } finally {
+    if (loginBtn) {
+      loginBtn.textContent = originalText || 'Войти';
+      loginBtn.disabled = false;
+    }
   }
 };
 
@@ -137,22 +146,31 @@ window.register = async function() {
     return;
   }
   
+  // Проверяем уникальность username
   try {
     const existing = await db.collection('users').where('username', '==', username.toLowerCase()).get();
-    if (!existing.empty) { 
-      showError('Username уже занят'); 
-      return; 
+    if (!existing.empty) {
+      showError('Username уже занят');
+      return;
     }
   } catch(e) {
     console.error(e);
   }
   
+  // Показываем загрузку
+  const registerBtn = document.getElementById('register-submit');
+  const originalText = registerBtn?.textContent;
+  if (registerBtn) {
+    registerBtn.textContent = '⏳ Регистрация...';
+    registerBtn.disabled = true;
+  }
+  
   try {
-    const userCred = await auth.createUserWithEmailAndPassword(email, password);
-    await userCred.user.updateProfile({ displayName: name });
+    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    await userCredential.user.updateProfile({ displayName: name });
     
-    await db.collection('users').doc(userCred.user.uid).set({
-      uid: userCred.user.uid,
+    const userData = {
+      uid: userCredential.user.uid,
       username: username.toLowerCase(),
       name: name,
       email: email,
@@ -160,44 +178,50 @@ window.register = async function() {
       bio: '',
       createdAt: new Date(),
       completedLessons: []
-    });
-    
-    currentUser = userCred.user;
-    window.userData = { 
-      uid: currentUser.uid,
-      username: username.toLowerCase(), 
-      name: name, 
-      email: email, 
-      avatar: selectedAvatar, 
-      completedLessons: [] 
     };
-    updateUI();
+    
+    await db.collection('users').doc(userCredential.user.uid).set(userData);
+    
+    currentUser = userCredential.user;
+    window.userData = userData;
+    window.userProgress = { completedLessons: [] };
+    
+    updateUIAfterLogin();
     closeAuthModal();
+    
     if (typeof showNotification === 'function') {
-      showNotification('Регистрация успешна!', 'success');
+      showNotification('Регистрация успешна! Добро пожаловать!', 'success');
     }
+    
     console.log('✅ Регистрация выполнена:', username);
-  } catch(e) {
-    console.error(e);
-    if (e.code === 'auth/email-already-in-use') showError('Email уже используется');
-    else if (e.code === 'auth/weak-password') showError('Слишком слабый пароль');
-    else showError('Ошибка: ' + e.message);
+    
+  } catch(error) {
+    console.error('Ошибка регистрации:', error);
+    if (error.code === 'auth/email-already-in-use') showError('Email уже используется');
+    else if (error.code === 'auth/weak-password') showError('Слишком слабый пароль');
+    else showError('Ошибка: ' + error.message);
+  } finally {
+    if (registerBtn) {
+      registerBtn.textContent = originalText || 'Зарегистрироваться';
+      registerBtn.disabled = false;
+    }
   }
 };
 
-async function loadUserData(uid) {
-  try {
-    const doc = await db.collection('users').doc(uid).get();
-    if (doc.exists) {
-      window.userData = doc.data();
-      window.userProgress = { completedLessons: window.userData.completedLessons || [] };
-      console.log('✅ Данные пользователя загружены');
-      return true;
-    }
-  } catch(e) { 
-    console.error('Ошибка загрузки данных:', e);
+function updateUIAfterLogin() {
+  const authContainer = document.getElementById('auth-container');
+  const userMenu = document.getElementById('user-menu');
+  const userName = document.getElementById('user-name');
+  const userAvatar = document.getElementById('user-avatar');
+  
+  if (currentUser && window.userData) {
+    const displayName = window.userData.name || currentUser.email.split('@')[0];
+    if (userName) userName.textContent = displayName;
+    if (userAvatar) userAvatar.textContent = window.userData.avatar || '👤';
+    if (authContainer) authContainer.style.display = 'none';
+    if (userMenu) userMenu.style.display = 'flex';
+    if (typeof renderProfilePage === 'function') renderProfilePage();
   }
-  return false;
 }
 
 window.logout = async function() {
@@ -205,42 +229,45 @@ window.logout = async function() {
     await auth.signOut();
     currentUser = null;
     window.userData = null;
-    updateUI();
+    
+    const authContainer = document.getElementById('auth-container');
+    const userMenu = document.getElementById('user-menu');
+    if (authContainer) authContainer.style.display = 'flex';
+    if (userMenu) userMenu.style.display = 'none';
+    
     if (typeof showPage === 'function') showPage('landing');
     if (typeof showNotification === 'function') showNotification('Вы вышли из аккаунта', 'info');
+    
     console.log('👋 Выход выполнен');
-  } catch(e) {
-    console.error(e);
+  } catch(error) {
+    console.error('Ошибка выхода:', error);
   }
 };
-
-function updateUI() {
-  const authDiv = document.getElementById('auth-container');
-  const userMenu = document.getElementById('user-menu');
-  const userName = document.getElementById('user-name');
-  const userAvatar = document.getElementById('user-avatar');
-  
-  if (currentUser && window.userData) {
-    if (authDiv) authDiv.style.display = 'none';
-    if (userMenu) userMenu.style.display = 'flex';
-    if (userName) userName.textContent = window.userData.name || currentUser.email.split('@')[0];
-    if (userAvatar) userAvatar.textContent = window.userData.avatar || '👤';
-    if (typeof renderProfilePage === 'function') renderProfilePage();
-  } else {
-    if (authDiv) authDiv.style.display = 'flex';
-    if (userMenu) userMenu.style.display = 'none';
-  }
-}
 
 // Слушатель авторизации
 auth.onAuthStateChanged(async (user) => {
   console.log('🔐 Auth state changed:', user ? `Пользователь ${user.email}` : 'Нет пользователя');
   currentUser = user;
+  
   if (user) {
-    await loadUserData(user.uid);
-    updateUI();
+    try {
+      const userDoc = await db.collection('users').doc(user.uid).get();
+      if (userDoc.exists) {
+        window.userData = userDoc.data();
+        window.userProgress = { completedLessons: window.userData.completedLessons || [] };
+      } else {
+        window.userData = { uid: user.uid, email: user.email, name: user.displayName || 'Пользователь', completedLessons: [] };
+      }
+      updateUIAfterLogin();
+    } catch(e) {
+      console.error('Ошибка загрузки данных:', e);
+    }
   } else {
-    updateUI();
+    const authContainer = document.getElementById('auth-container');
+    const userMenu = document.getElementById('user-menu');
+    if (authContainer) authContainer.style.display = 'flex';
+    if (userMenu) userMenu.style.display = 'none';
+    window.userData = null;
   }
 });
 
