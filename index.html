@@ -16,7 +16,7 @@
   <!-- Styles -->
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
+<body data-theme="light">
 
 <!-- TOP NAVIGATION -->
 <nav class="top-nav glass-nav">
@@ -31,18 +31,40 @@
     <div class="nav-links">
       <button class="nav-link" data-page="landing" onclick="showPage('landing')">Главная</button>
       <button class="nav-link" data-page="courses" onclick="showPage('courses')">Курсы</button>
-      <button class="nav-link" data-page="community" onclick="showPage('community')">Сообщество</button>
-      <button class="nav-link" data-page="pricing" onclick="showPage('pricing')">Цены</button>
     </div>
     
     <div class="nav-actions">
+      <div class="theme-toggle">
+        <button class="theme-trigger-btn icon-btn">
+          <span class="material-symbols-outlined">palette</span>
+        </button>
+        <div class="theme-dropdown" id="theme-dropdown">
+          <div class="theme-option" data-theme="light">
+            <span class="material-symbols-outlined">light_mode</span>
+            <span>Светлая</span>
+          </div>
+          <div class="theme-option" data-theme="dark">
+            <span class="material-symbols-outlined">dark_mode</span>
+            <span>Тёмная</span>
+          </div>
+          <div class="theme-option" data-theme="sunset">
+            <span class="material-symbols-outlined">wb_sunny</span>
+            <span>Закат</span>
+          </div>
+          <div class="theme-option" data-theme="ocean">
+            <span class="material-symbols-outlined">waves</span>
+            <span>Океан</span>
+          </div>
+          <div class="theme-option" data-theme="lavender">
+            <span class="material-symbols-outlined">spa</span>
+            <span>Лаванда</span>
+          </div>
+        </div>
+      </div>
       <div class="lang-toggle">
         <button class="lang-btn" data-lang="ru" onclick="setLanguage('ru')">RU</button>
         <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">EN</button>
       </div>
-      <button class="icon-btn dark-mode-btn" onclick="toggleDarkMode()">
-        <span class="material-symbols-outlined">dark_mode</span>
-      </button>
       
       <div id="auth-container" style="display: flex; gap: 0.5rem;">
         <button id="auth-trigger-btn" class="btn-secondary" data-t="nav_login">Войти</button>
@@ -70,8 +92,8 @@
     
     <div id="login-form">
       <div class="form-group">
-        <label class="form-label" data-t="email">Email</label>
-        <input type="email" id="login-email" class="form-input" placeholder="example@mail.com">
+        <label class="form-label" data-t="username_or_email">Email или Username</label>
+        <input type="text" id="login-username" class="form-input" placeholder="example@mail.com или @username">
       </div>
       <div class="form-group">
         <label class="form-label" data-t="password">Пароль</label>
@@ -85,6 +107,11 @@
     
     <div id="register-form" style="display: none;">
       <div class="form-group">
+        <label class="form-label" data-t="username">Username</label>
+        <input type="text" id="register-username" class="form-input" placeholder="@username">
+        <small style="color: var(--on-surface-variant); font-size: 0.7rem;">Только буквы, цифры и _</small>
+      </div>
+      <div class="form-group">
         <label class="form-label" data-t="name">Имя</label>
         <input type="text" id="register-name" class="form-input" placeholder="Ваше имя">
       </div>
@@ -95,6 +122,12 @@
       <div class="form-group">
         <label class="form-label" data-t="password">Пароль</label>
         <input type="password" id="register-password" class="form-input" placeholder="минимум 6 символов">
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-t="avatar_emoji">Выберите аватар (животное)</label>
+        <div class="avatar-emoji-grid" id="avatar-emoji-grid">
+          <!-- Эмодзи будут добавлены через JS -->
+        </div>
       </div>
       <button id="register-submit" class="btn-primary" style="width: 100%;" data-t="register_btn">Зарегистрироваться</button>
       <p style="text-align: center; margin-top: 1rem;">
@@ -153,6 +186,33 @@
   </div>
 </div>
 
+<!-- EDIT PROFILE MODAL -->
+<div id="edit-profile-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" data-t="edit_profile">Редактировать профиль</h2>
+      <button class="modal-close" onclick="closeEditProfileModal()">&times;</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-t="name">Имя</label>
+      <input type="text" id="edit-name" class="form-input">
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-t="bio">О себе</label>
+      <textarea id="edit-bio" class="form-textarea" rows="3" placeholder="Расскажите о себе..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-t="location">Местоположение</label>
+      <input type="text" id="edit-location" class="form-input" placeholder="Город, страна">
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-t="website">Сайт</label>
+      <input type="url" id="edit-website" class="form-input" placeholder="https://...">
+    </div>
+    <button id="save-profile-btn" class="btn-primary" style="width: 100%;" data-t="save_changes">Сохранить изменения</button>
+  </div>
+</div>
+
 <!-- PAGES -->
 
 <!-- LANDING PAGE -->
@@ -169,6 +229,14 @@
           <p class="hero-subtitle" data-t="hero_subtitle">Осваивай программирование, создавай свои тесты и делись знаниями с другими.</p>
           <div class="hero-actions">
             <button class="btn-primary lg" onclick="showPage('courses')" data-t="hero_cta">Начать обучение</button>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-visual-glow"></div>
+          <div class="hero-visual-card">
+            <div class="hero-visual-inner">
+              <span class="material-symbols-outlined hero-visual-icon">terminal</span>
+            </div>
           </div>
         </div>
       </div>
@@ -188,44 +256,6 @@
         </button>
       </div>
       <div id="courses-container" class="courses-grid"></div>
-    </div>
-  </div>
-</div>
-
-<!-- COMMUNITY PAGE -->
-<div id="page-community" class="page">
-  <div class="courses-page">
-    <div class="section-inner">
-      <h1 class="section-title" data-t="community_title">Сообщество</h1>
-      <p class="section-subtitle" data-t="community_subtitle">Общайтесь с другими разработчиками, делитесь опытом и находите единомышленников</p>
-      <div class="community-placeholder" style="text-align: center; padding: 4rem;">
-        <span class="material-symbols-outlined" style="font-size: 4rem; color: var(--primary);">groups</span>
-        <p style="margin-top: 1rem;" data-t="community_soon">Скоро здесь появится сообщество</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- PRICING PAGE -->
-<div id="page-pricing" class="page">
-  <div class="courses-page">
-    <div class="section-inner">
-      <h1 class="section-title" data-t="pricing_title">Цены</h1>
-      <p class="section-subtitle" data-t="pricing_subtitle">Выберите подходящий тариф для обучения</p>
-      <div class="pricing-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
-        <div class="pricing-card" style="background: var(--surface-lowest); border-radius: var(--radius-sm); padding: 2rem; text-align: center;">
-          <h3 style="font-size: 1.5rem; font-weight: 800;" data-t="free">Бесплатный</h3>
-          <div style="font-size: 2.5rem; font-weight: 800; margin: 1rem 0;">0 ₽</div>
-          <p data-t="free_desc">Доступ ко всем базовым курсам</p>
-          <button class="btn-secondary" style="margin-top: 1.5rem;" data-t="current_plan">Текущий план</button>
-        </div>
-        <div class="pricing-card" style="background: var(--surface-lowest); border-radius: var(--radius-sm); padding: 2rem; text-align: center; border: 2px solid var(--primary);">
-          <h3 style="font-size: 1.5rem; font-weight: 800;" data-t="pro">Pro</h3>
-          <div style="font-size: 2.5rem; font-weight: 800; margin: 1rem 0;">990 ₽<span style="font-size: 1rem;">/мес</span></div>
-          <p data-t="pro_desc">Все курсы + сертификаты + поддержка</p>
-          <button class="btn-primary" style="margin-top: 1.5rem;" data-t="upgrade">Выбрать</button>
-        </div>
-      </div>
     </div>
   </div>
 </div>
@@ -256,15 +286,11 @@
   <div class="mobile-nav-inner">
     <button class="mobile-nav-btn" data-page="landing" onclick="showPage('landing')">
       <span class="material-symbols-outlined">school</span>
-      <span data-t="mobile_learn">Обучение</span>
+      <span data-t="mobile_home">Главная</span>
     </button>
     <button class="mobile-nav-btn" data-page="courses" onclick="showPage('courses')">
       <span class="material-symbols-outlined">menu_book</span>
       <span data-t="mobile_courses">Курсы</span>
-    </button>
-    <button class="mobile-nav-btn" data-page="community" onclick="showPage('community')">
-      <span class="material-symbols-outlined">groups</span>
-      <span data-t="mobile_community">Сообщество</span>
     </button>
     <button class="mobile-nav-btn" data-page="profile" onclick="showPage('profile')">
       <span class="material-symbols-outlined">account_circle</span>
@@ -275,9 +301,11 @@
 
 <!-- SCRIPTS -->
 <script src="js/firebase-config.js"></script>
+<script src="js/themes.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/courses.js"></script>
 <script src="js/lessons.js"></script>
+<script src="js/profile.js"></script>
 <script src="js/app.js"></script>
 
 </body>
