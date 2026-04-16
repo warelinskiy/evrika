@@ -240,7 +240,6 @@ window.login = async function() {
   }
 };
 
-// ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ REGISTER (БЕЗ FIRESTORE) ==========
 window.register = async function() {
   const username = document.getElementById('register-username')?.value.trim();
   const name = document.getElementById('register-name')?.value.trim();
@@ -262,6 +261,17 @@ window.register = async function() {
     return;
   }
   
+  // Проверяем уникальность username
+  try {
+    const existing = await db.collection('users').where('username', '==', username.toLowerCase()).get();
+    if (!existing.empty) {
+      showError('Username уже занят');
+      return;
+    }
+  } catch(e) {
+    console.error(e);
+  }
+  
   const registerBtn = document.getElementById('register-submit');
   const originalText = registerBtn?.textContent;
   if (registerBtn) {
@@ -270,11 +280,24 @@ window.register = async function() {
   }
   
   try {
-    // ТОЛЬКО АВТОРИЗАЦИЯ, БЕЗ FIRESTORE
     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
     const user = userCredential.user;
     
     await user.updateProfile({ displayName: name });
+    
+    // Сохраняем данные в Firestore
+    const userData = {
+      uid: user.uid,
+      username: username.toLowerCase(),
+      name: name,
+      email: email,
+      avatar: selectedAvatar,
+      bio: '',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      completedLessons: []
+    };
+    
+    await db.collection('users').doc(user.uid).set(userData);
     
     // Отправляем письмо с подтверждением
     const emailSent = await sendVerificationEmail(user);
