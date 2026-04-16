@@ -1,11 +1,12 @@
 // ============================================
-// МОДУЛЬ АВТОРИЗАЦИИ (ПРОСТАЯ ВЕРСИЯ)
+// МОДУЛЬ АВТОРИЗАЦИИ (С ПОДТВЕРЖДЕНИЕМ EMAIL)
 // ============================================
 
 let currentUser = null;
 let selectedAvatar = '🐱';
+let pendingVerificationEmail = null;
 
-const animalEmojis = ['🐱', '🐶', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵'];
+const animalEmojis = ['🐱', '🐶', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐴', '🦄'];
 
 function renderAvatarGrid() {
   const grid = document.getElementById('avatar-emoji-grid');
@@ -31,9 +32,26 @@ function showError(msg) {
     errDiv.style.display = 'block';
     setTimeout(() => {
       if (errDiv) errDiv.style.display = 'none';
-    }, 3000);
+    }, 5000);
   } else {
     alert(msg);
+  }
+}
+
+function showSuccess(msg) {
+  const errDiv = document.getElementById('auth-error');
+  if (errDiv) {
+    errDiv.textContent = msg;
+    errDiv.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+    errDiv.style.color = '#10b981';
+    errDiv.style.display = 'block';
+    setTimeout(() => {
+      if (errDiv) {
+        errDiv.style.display = 'none';
+        errDiv.style.backgroundColor = '';
+        errDiv.style.color = '';
+      }
+    }, 5000);
   }
 }
 
@@ -43,7 +61,11 @@ window.showLoginForm = function() {
   if (loginForm) loginForm.style.display = 'block';
   if (registerForm) registerForm.style.display = 'none';
   const errDiv = document.getElementById('auth-error');
-  if (errDiv) errDiv.style.display = 'none';
+  if (errDiv) {
+    errDiv.style.display = 'none';
+    errDiv.style.backgroundColor = '';
+    errDiv.style.color = '';
+  }
 };
 
 window.showRegisterForm = function() {
@@ -53,7 +75,11 @@ window.showRegisterForm = function() {
   if (registerForm) registerForm.style.display = 'block';
   renderAvatarGrid();
   const errDiv = document.getElementById('auth-error');
-  if (errDiv) errDiv.style.display = 'none';
+  if (errDiv) {
+    errDiv.style.display = 'none';
+    errDiv.style.backgroundColor = '';
+    errDiv.style.color = '';
+  }
 };
 
 window.openAuthModal = function() {
@@ -68,16 +94,103 @@ window.closeAuthModal = function() {
   const modal = document.getElementById('auth-modal');
   if (modal) {
     modal.classList.remove('active');
+    const inputs = modal.querySelectorAll('input');
+    inputs.forEach(i => i.value = '');
+    const errDiv = document.getElementById('auth-error');
+    if (errDiv) {
+      errDiv.style.display = 'none';
+      errDiv.style.backgroundColor = '';
+      errDiv.style.color = '';
+    }
   }
 };
 
+// Функция для отправки письма с подтверждением
+async function sendVerificationEmail(user) {
+  try {
+    await user.sendEmailVerification();
+    console.log('📧 Письмо с подтверждением отправлено на:', user.email);
+    return true;
+  } catch (error) {
+    console.error('Ошибка отправки письма:', error);
+    return false;
+  }
+}
+
+// Проверка подтвержден ли email
+function isEmailVerified(user) {
+  return user.emailVerified;
+}
+
+// Показать уведомление о необходимости подтвердить email
+function showVerificationDialog(email) {
+  // Создаем модальное окно поверх существующего
+  const modal = document.createElement('div');
+  modal.className = 'verification-modal';
+  modal.innerHTML = `
+    <div class="verification-modal-content">
+      <div class="verification-icon">📧</div>
+      <h3>Подтвердите email</h3>
+      <p>Мы отправили письмо с подтверждением на</p>
+      <p><strong>${email}</strong></p>
+      <p>Пожалуйста, перейдите по ссылке в письме, чтобы подтвердить свой аккаунт.</p>
+      <p class="verification-note">После подтверждения вы сможете войти в аккаунт.</p>
+      <div class="verification-buttons">
+        <button class="btn-primary" onclick="resendVerificationEmail()">Отправить повторно</button>
+        <button class="btn-secondary" onclick="closeVerificationDialog()">Закрыть</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  setTimeout(() => modal.classList.add('active'), 10);
+}
+
+window.resendVerificationEmail = async function() {
+  if (pendingVerificationEmail && auth.currentUser) {
+    const sent = await sendVerificationEmail(auth.currentUser);
+    if (sent) {
+      showSuccess('Письмо с подтверждением отправлено повторно! Проверьте почту.');
+    } else {
+      showError('Не удалось отправить письмо. Попробуйте позже.');
+    }
+  }
+};
+
+window.closeVerificationDialog = function() {
+  const modal = document.querySelector('.verification-modal');
+  if (modal) {
+    modal.classList.remove('active');
+    setTimeout(() => modal.remove(), 300);
+  }
+  // Разлогиниваем пользователя, так как email не подтвержден
+  if (auth.currentUser) {
+    auth.signOut();
+  }
+  pendingVerificationEmail = null;
+};
+
 window.login = async function() {
-  const emailInput = document.getElementById('login-username')?.value.trim();
+  const input = document.getElementById('login-username')?.value.trim();
   const password = document.getElementById('login-password')?.value;
   
-  if (!emailInput || !password) {
+  if (!input || !password) {
     showError('Заполните все поля');
     return;
+  }
+  
+  let email = input;
+  if (!input.includes('@')) {
+    try {
+      const users = await db.collection('users').where('username', '==', input.toLowerCase()).get();
+      if (users.empty) { 
+        showError('Пользователь не найден'); 
+        return; 
+      }
+      email = users.docs[0].data().email;
+    } catch(e) { 
+      showError('Ошибка поиска'); 
+      return; 
+    }
   }
   
   // Показываем загрузку
@@ -89,8 +202,21 @@ window.login = async function() {
   }
   
   try {
-    const userCredential = await auth.signInWithEmailAndPassword(emailInput, password);
-    currentUser = userCredential.user;
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+    
+    // Проверяем, подтвержден ли email
+    if (!user.emailVerified) {
+      showError('Email не подтвержден! Проверьте почту и перейдите по ссылке в письме.');
+      await auth.signOut();
+      if (loginBtn) {
+        loginBtn.textContent = originalText || 'Войти';
+        loginBtn.disabled = false;
+      }
+      return;
+    }
+    
+    currentUser = user;
     
     // Загружаем данные пользователя
     const userDoc = await db.collection('users').doc(currentUser.uid).get();
@@ -101,7 +227,6 @@ window.login = async function() {
       window.userData = { uid: currentUser.uid, email: currentUser.email, name: currentUser.displayName || 'Пользователь', completedLessons: [] };
     }
     
-    // Обновляем UI
     updateUIAfterLogin();
     closeAuthModal();
     
@@ -167,33 +292,43 @@ window.register = async function() {
   
   try {
     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-    await userCredential.user.updateProfile({ displayName: name });
+    const user = userCredential.user;
     
+    // Обновляем профиль
+    await user.updateProfile({ displayName: name });
+    
+    // Сохраняем данные в Firestore
     const userData = {
-      uid: userCredential.user.uid,
+      uid: user.uid,
       username: username.toLowerCase(),
       name: name,
       email: email,
       avatar: selectedAvatar,
       bio: '',
       createdAt: new Date(),
-      completedLessons: []
+      completedLessons: [],
+      emailVerified: false
     };
     
-    await db.collection('users').doc(userCredential.user.uid).set(userData);
+    await db.collection('users').doc(user.uid).set(userData);
     
-    currentUser = userCredential.user;
-    window.userData = userData;
-    window.userProgress = { completedLessons: [] };
+    // Отправляем письмо с подтверждением
+    const emailSent = await sendVerificationEmail(user);
     
-    updateUIAfterLogin();
-    closeAuthModal();
-    
-    if (typeof showNotification === 'function') {
-      showNotification('Регистрация успешна! Добро пожаловать!', 'success');
+    if (emailSent) {
+      pendingVerificationEmail = email;
+      showVerificationDialog(email);
+      showSuccess('Регистрация почти завершена! Проверьте почту.');
+    } else {
+      showError('Не удалось отправить письмо с подтверждением. Попробуйте позже.');
     }
     
-    console.log('✅ Регистрация выполнена:', username);
+    // Выходим из аккаунта до подтверждения email
+    await auth.signOut();
+    
+    closeAuthModal();
+    
+    console.log('✅ Регистрация выполнена, письмо отправлено на:', email);
     
   } catch(error) {
     console.error('Ошибка регистрации:', error);
@@ -250,17 +385,40 @@ auth.onAuthStateChanged(async (user) => {
   currentUser = user;
   
   if (user) {
-    try {
-      const userDoc = await db.collection('users').doc(user.uid).get();
-      if (userDoc.exists) {
-        window.userData = userDoc.data();
-        window.userProgress = { completedLessons: window.userData.completedLessons || [] };
-      } else {
-        window.userData = { uid: user.uid, email: user.email, name: user.displayName || 'Пользователь', completedLessons: [] };
+    // Проверяем, изменился ли статус верификации email
+    if (user.emailVerified) {
+      try {
+        const userDoc = await db.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+          window.userData = userDoc.data();
+          window.userProgress = { completedLessons: window.userData.completedLessons || [] };
+          
+          // Если email только что подтвержден, обновляем статус в БД
+          if (!window.userData.emailVerified) {
+            await db.collection('users').doc(user.uid).update({ emailVerified: true });
+            window.userData.emailVerified = true;
+            if (typeof showNotification === 'function') {
+              showNotification('Email подтвержден! Теперь вы можете пользоваться аккаунтом.', 'success');
+            }
+          }
+        } else {
+          window.userData = { uid: user.uid, email: user.email, name: user.displayName || 'Пользователь', completedLessons: [], emailVerified: true };
+        }
+        updateUIAfterLogin();
+      } catch(e) {
+        console.error('Ошибка загрузки данных:', e);
       }
-      updateUIAfterLogin();
-    } catch(e) {
-      console.error('Ошибка загрузки данных:', e);
+    } else {
+      // Email не подтвержден - не даем войти
+      console.log('Email не подтвержден, выход...');
+      await auth.signOut();
+      currentUser = null;
+      window.userData = null;
+      
+      const authContainer = document.getElementById('auth-container');
+      const userMenu = document.getElementById('user-menu');
+      if (authContainer) authContainer.style.display = 'flex';
+      if (userMenu) userMenu.style.display = 'none';
     }
   } else {
     const authContainer = document.getElementById('auth-container');
@@ -273,7 +431,7 @@ auth.onAuthStateChanged(async (user) => {
 
 // Инициализация
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🔐 Инициализация auth.js');
+  console.log('🔐 Инициализация auth.js с подтверждением email');
   
   const trigger = document.getElementById('auth-trigger-btn');
   if (trigger) trigger.addEventListener('click', openAuthModal);
@@ -301,4 +459,4 @@ document.addEventListener('DOMContentLoaded', () => {
   renderAvatarGrid();
 });
 
-console.log('🔐 auth.js загружен');
+console.log('🔐 auth.js с подтверждением email загружен');
