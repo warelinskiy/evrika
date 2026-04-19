@@ -3,6 +3,34 @@
 // ============================================
 
 // Уведомления
+// Показ админ-панели
+window.showAdminPanel = function() {
+    if (typeof renderAdminPanel === 'function') {
+        renderAdminPanel();
+    }
+};
+
+// Показывать/скрывать кнопку админ-панели в зависимости от прав
+window.updateAdminButton = function() {
+    const adminBtn = document.getElementById('admin-nav-btn');
+    if (adminBtn) {
+        if (currentUser && typeof isAdmin === 'function' && isAdmin(currentUser)) {
+            adminBtn.style.display = 'block';
+        } else {
+            adminBtn.style.display = 'none';
+        }
+    }
+};
+
+// Добавляем в showPage поддержку админ-панели
+const originalShowPage = window.showPage;
+window.showPage = function(pageId) {
+    if (originalShowPage) originalShowPage(pageId);
+    if (pageId === 'admin' && typeof renderAdminPanel === 'function') {
+        renderAdminPanel();
+    }
+};
+
 window.showNotification = function(msg, type = 'info') {
   const colors = { success: '#10b981', error: '#ef4444', info: '#3b82f6' };
   const div = document.createElement('div');
