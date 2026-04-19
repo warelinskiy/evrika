@@ -1,10 +1,9 @@
 // ============================================
-// МОДУЛЬ АВТОРИЗАЦИИ (С ПОДТВЕРЖДЕНИЕМ EMAIL)
+// МОДУЛЬ АВТОРИЗАЦИИ (БЕЗ ПОДТВЕРЖДЕНИЯ EMAIL)
 // ============================================
 
 let currentUser = null;
 let selectedAvatar = '🐱';
-let pendingVerificationEmail = null;
 
 const animalEmojis = ['🐱', '🐶', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐴', '🦄'];
 
@@ -105,63 +104,6 @@ window.closeAuthModal = function() {
   }
 };
 
-// Функция для отправки письма с подтверждением
-async function sendVerificationEmail(user) {
-  try {
-    await user.sendEmailVerification();
-    console.log('📧 Письмо с подтверждением отправлено на:', user.email);
-    return true;
-  } catch (error) {
-    console.error('Ошибка отправки письма:', error);
-    return false;
-  }
-}
-
-// Показать уведомление о необходимости подтвердить email
-function showVerificationDialog(email) {
-  const modal = document.createElement('div');
-  modal.className = 'verification-modal';
-  modal.innerHTML = `
-    <div class="verification-modal-content">
-      <div class="verification-icon">📧</div>
-      <h3>Подтвердите email</h3>
-      <p>Мы отправили письмо с подтверждением на</p>
-      <p><strong>${email}</strong></p>
-      <p>Пожалуйста, перейдите по ссылке в письме, чтобы подтвердить свой аккаунт.</p>
-      <p class="verification-note">После подтверждения вы сможете войти в аккаунт.</p>
-      <div class="verification-buttons">
-        <button class="btn-primary" onclick="resendVerificationEmail()">Отправить повторно</button>
-        <button class="btn-secondary" onclick="closeVerificationDialog()">Закрыть</button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  setTimeout(() => modal.classList.add('active'), 10);
-}
-
-window.resendVerificationEmail = async function() {
-  if (pendingVerificationEmail && auth.currentUser) {
-    const sent = await sendVerificationEmail(auth.currentUser);
-    if (sent) {
-      showSuccess('Письмо с подтверждением отправлено повторно! Проверьте почту.');
-    } else {
-      showError('Не удалось отправить письмо. Попробуйте позже.');
-    }
-  }
-};
-
-window.closeVerificationDialog = function() {
-  const modal = document.querySelector('.verification-modal');
-  if (modal) {
-    modal.classList.remove('active');
-    setTimeout(() => modal.remove(), 300);
-  }
-  if (auth.currentUser) {
-    auth.signOut();
-  }
-  pendingVerificationEmail = null;
-};
-
 window.login = async function() {
   const input = document.getElementById('login-username')?.value.trim();
   const password = document.getElementById('login-password')?.value;
@@ -195,19 +137,7 @@ window.login = async function() {
   
   try {
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
-    const user = userCredential.user;
-    
-    if (!user.emailVerified) {
-      showError('Email не подтвержден! Проверьте почту и перейдите по ссылке в письме.');
-      await auth.signOut();
-      if (loginBtn) {
-        loginBtn.textContent = originalText || 'Войти';
-        loginBtn.disabled = false;
-      }
-      return;
-    }
-    
-    currentUser = user;
+    currentUser = userCredential.user;
     
     const userDoc = await db.collection('users').doc(currentUser.uid).get();
     if (userDoc.exists) {
@@ -299,21 +229,18 @@ window.register = async function() {
     
     await db.collection('users').doc(user.uid).set(userData);
     
-    // Отправляем письмо с подтверждением
-    const emailSent = await sendVerificationEmail(user);
+    currentUser = user;
+    window.userData = userData;
+    window.userProgress = { completedLessons: [] };
     
-    if (emailSent) {
-      pendingVerificationEmail = email;
-      showVerificationDialog(email);
-      showSuccess('Регистрация почти завершена! Проверьте почту.');
-    } else {
-      showError('Не удалось отправить письмо с подтверждением. Попробуйте позже.');
-    }
-    
-    await auth.signOut();
+    updateUIAfterLogin();
     closeAuthModal();
     
-    console.log('✅ Регистрация выполнена, письмо отправлено на:', email);
+    if (typeof showNotification === 'function') {
+      showNotification('Регистрация успешна! Добро пожаловать!', 'success');
+    }
+    
+    console.log('✅ Регистрация выполнена:', username);
     
   } catch(error) {
     console.error('Ошибка регистрации:', error);
@@ -370,22 +297,17 @@ auth.onAuthStateChanged(async (user) => {
   currentUser = user;
   
   if (user) {
-    if (user.emailVerified) {
-      try {
-        const userDoc = await db.collection('users').doc(user.uid).get();
-        if (userDoc.exists) {
-          window.userData = userDoc.data();
-          window.userProgress = { completedLessons: window.userData.completedLessons || [] };
-          updateUIAfterLogin();
-        } else {
-          window.userData = { uid: user.uid, email: user.email, name: user.displayName || 'Пользователь', completedLessons: [] };
-          updateUIAfterLogin();
-        }
-      } catch(e) {
-        console.error('Ошибка загрузки данных:', e);
+    try {
+      const userDoc = await db.collection('users').doc(user.uid).get();
+      if (userDoc.exists) {
+        window.userData = userDoc.data();
+        window.userProgress = { completedLessons: window.userData.completedLessons || [] };
+      } else {
+        window.userData = { uid: user.uid, email: user.email, name: user.displayName || 'Пользователь', completedLessons: [] };
       }
-    } else {
-      console.log('Email не подтвержден');
+      updateUIAfterLogin();
+    } catch(e) {
+      console.error('Ошибка загрузки данных:', e);
     }
   } else {
     const authContainer = document.getElementById('auth-container');
@@ -398,7 +320,7 @@ auth.onAuthStateChanged(async (user) => {
 
 // Инициализация
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🔐 Инициализация auth.js с подтверждением email');
+  console.log('🔐 Инициализация auth.js');
   
   const trigger = document.getElementById('auth-trigger-btn');
   if (trigger) trigger.addEventListener('click', openAuthModal);
@@ -426,4 +348,4 @@ document.addEventListener('DOMContentLoaded', () => {
   renderAvatarGrid();
 });
 
-console.log('🔐 auth.js с подтверждением email загружен');
+console.log('🔐 auth.js загружен');
