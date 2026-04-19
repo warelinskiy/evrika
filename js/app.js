@@ -3,34 +3,6 @@
 // ============================================
 
 // Уведомления
-// Показ админ-панели
-window.showAdminPanel = function() {
-    if (typeof renderAdminPanel === 'function') {
-        renderAdminPanel();
-    }
-};
-
-// Показывать/скрывать кнопку админ-панели в зависимости от прав
-window.updateAdminButton = function() {
-    const adminBtn = document.getElementById('admin-nav-btn');
-    if (adminBtn) {
-        if (currentUser && typeof isAdmin === 'function' && isAdmin(currentUser)) {
-            adminBtn.style.display = 'block';
-        } else {
-            adminBtn.style.display = 'none';
-        }
-    }
-};
-
-// Добавляем в showPage поддержку админ-панели
-const originalShowPage = window.showPage;
-window.showPage = function(pageId) {
-    if (originalShowPage) originalShowPage(pageId);
-    if (pageId === 'admin' && typeof renderAdminPanel === 'function') {
-        renderAdminPanel();
-    }
-};
-
 window.showNotification = function(msg, type = 'info') {
   const colors = { success: '#10b981', error: '#ef4444', info: '#3b82f6' };
   const div = document.createElement('div');
@@ -52,6 +24,25 @@ window.showNotification = function(msg, type = 'info') {
   setTimeout(() => div.remove(), 3000);
 };
 
+// Показ админ-панели
+window.showAdminPanel = function() {
+    if (typeof renderAdminPanel === 'function') {
+        renderAdminPanel();
+    }
+};
+
+// Показывать/скрывать кнопку админ-панели
+window.updateAdminButton = function() {
+    const adminBtn = document.getElementById('admin-nav-btn');
+    if (adminBtn) {
+        if (currentUser && typeof isAdmin === 'function' && isAdmin(currentUser)) {
+            adminBtn.style.display = 'block';
+        } else {
+            adminBtn.style.display = 'none';
+        }
+    }
+};
+
 // Переключение страниц
 window.showPage = function(pageId) {
   console.log('📄 Переход на страницу:', pageId);
@@ -63,11 +54,14 @@ window.showPage = function(pageId) {
   if (pageId === 'profile' && typeof renderProfilePage === 'function') {
     renderProfilePage();
   }
+  if (pageId === 'admin' && typeof renderAdminPanel === 'function') {
+    renderAdminPanel();
+  }
   
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// Добавляем анимацию (только один раз)
+// Добавляем анимацию
 if (!document.querySelector('#app-animations')) {
   const animStyle = document.createElement('style');
   animStyle.id = 'app-animations';
@@ -84,7 +78,6 @@ if (!document.querySelector('#app-animations')) {
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 Приложение загружено');
   
-  // Закрытие модальных окон по клику на фон
   document.querySelectorAll('.modal-overlay').forEach(modal => {
     modal.addEventListener('click', (e) => {
       if (e.target === modal && typeof closeAuthModal === 'function') {
