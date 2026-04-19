@@ -16,12 +16,13 @@
 </head>
 <body>
 
-  <!-- АДМИН-ПАНЕЛЬ -->
+<!-- АДМИН-ПАНЕЛЬ -->
 <div id="page-admin" class="page">
     <div class="admin-page">
         <div id="admin-container"></div>
     </div>
 </div>
+
 <!-- НАВИГАЦИЯ -->
 <nav class="glass-nav">
   <div class="nav-inner">
@@ -29,11 +30,11 @@
       <div class="nav-brand-icon"><span class="material-symbols-outlined" style="color:#382400;">lightbulb</span></div>
       <span>Эврика</span>
     </div>
-<div class="nav-links">
-    <button class="nav-link" onclick="showPage('landing')">Главная</button>
-    <button class="nav-link" onclick="showPage('profile')">Профиль</button>
-    <button class="nav-link" id="admin-nav-btn" onclick="showPage('admin')" style="display: none;">👑 Админ</button>
-</div>
+    <div class="nav-links">
+      <button class="nav-link" onclick="showPage('landing')">Главная</button>
+      <button class="nav-link" onclick="showPage('profile')">Профиль</button>
+      <button class="nav-link" id="admin-nav-btn" onclick="showPage('admin')" style="display: none;">👑 Админ</button>
+    </div>
     <div class="nav-actions">
       <div class="theme-toggle">
         <button class="icon-btn theme-trigger-btn"><span class="material-symbols-outlined">palette</span></button>
@@ -59,7 +60,7 @@
   </div>
 </nav>
 
-<!-- ========== МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ (ПОЛНОСТЬЮ ВОССТАНОВЛЕНО) ========== -->
+<!-- МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ -->
 <div id="auth-modal" class="modal-overlay">
   <div class="modal">
     <div class="modal-header">
@@ -68,7 +69,6 @@
     </div>
     <div id="auth-error" class="auth-error" style="display:none;"></div>
     
-    <!-- Форма входа -->
     <div id="login-form">
       <div class="form-group">
         <label class="form-label">Email</label>
@@ -84,7 +84,6 @@
       </p>
     </div>
     
-    <!-- Форма регистрации -->
     <div id="register-form" style="display:none;">
       <div class="form-group">
         <label class="form-label">Username</label>
@@ -158,7 +157,6 @@
 <div id="page-landing" class="page active">
   <div class="landing-wrap">
     
-    <!-- БЛОК 1 - Главный -->
     <section class="hero-section">
       <div class="hero-container">
         <div class="hero-content">
@@ -181,7 +179,6 @@
       </div>
     </section>
 
-    <!-- БЛОК 2 - Создавай и зарабатывай -->
     <section class="hero-section alt">
       <div class="hero-container reverse">
         <div class="hero-visual">
@@ -205,7 +202,6 @@
       </div>
     </section>
 
-    <!-- БЛОК 3 - Научный подход -->
     <section class="hero-section">
       <div class="hero-container">
         <div class="hero-content">
@@ -227,7 +223,6 @@
       </div>
     </section>
 
-    <!-- БЛОК 4 - Как проходит обучение -->
     <section class="hero-section alt">
       <div class="hero-container reverse">
         <div class="hero-visual">
@@ -248,7 +243,6 @@
       </div>
     </section>
 
-    <!-- БЛОК 5 - Глубокое понимание -->
     <section class="hero-section">
       <div class="hero-container">
         <div class="hero-content">
@@ -266,7 +260,6 @@
       </div>
     </section>
 
-    <!-- БЛОК 6 - Обучение без давления -->
     <section class="hero-section alt">
       <div class="hero-container reverse">
         <div class="hero-visual">
@@ -289,7 +282,6 @@
       </div>
     </section>
 
-    <!-- БЛОК 7 - Наши советы -->
     <section class="hero-section">
       <div class="hero-container">
         <div class="hero-content">
@@ -326,7 +318,6 @@
       </div>
     </section>
 
-    <!-- БЛОК 8 - CTA -->
     <section class="hero-section alt cta-section">
       <div class="hero-container reverse">
         <div class="hero-visual">
@@ -372,25 +363,6 @@
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme) document.body.setAttribute('data-theme', savedTheme);
   
-  // ========== УВЕДОМЛЕНИЯ ==========
-  window.showNotification = function(msg, type = 'info') {
-    const colors = { success: '#10b981', error: '#ef4444', info: '#3b82f6' };
-    const div = document.createElement('div');
-    div.style.cssText = `position:fixed; bottom:20px; right:20px; padding:12px 24px; background:${colors[type]}; color:white; border-radius:12px; z-index:10000; animation:slideIn 0.3s ease; font-size:14px;`;
-    div.textContent = msg;
-    document.body.appendChild(div);
-    setTimeout(() => div.remove(), 3000);
-  };
-  
-  // ========== ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ ==========
-  window.showPage = function(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const target = document.getElementById(`page-${pageId}`);
-    if (target) target.classList.add('active');
-    if (pageId === 'profile' && typeof renderProfilePage === 'function') renderProfilePage();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-  
   // ========== ЯЗЫКИ ==========
   window.setLanguage = function(lang) {
     localStorage.setItem('language', lang);
@@ -417,6 +389,7 @@
 <script src="js/auth.js"></script>
 <script src="js/profile.js"></script>
 <script src="js/settings.js"></script>
+<script src="js/admin.js"></script>
 <script src="js/app.js"></script>
 
 </body>
