@@ -4,9 +4,10 @@
 
 // Конфигурация админов (UID пользователей, которые имеют доступ)
 // Добавьте сюда UID пользователей, которые должны быть админами
+// UID можно найти в Firebase Console → Authentication → Users
 const ADMIN_UIDs = [
-    'KS7Weht01od4kA9tTQpo7jykysh2'
-    // 'UID_ПОЛЬЗОВАТЕЛЯ_2',  // Добавьте сюда UID второго админа
+    'KS7Weht01od4kA9tTQpo7jykysh2'  // <- ВАШ UID (добавьте кавычки!)
+    // 'UID_ПОЛЬЗОВАТЕЛЯ_2',
 ];
 
 // Функция проверки, является ли пользователь админом
@@ -18,15 +19,14 @@ window.isAdmin = function(user) {
 // Функция добавления нового админа (только для существующих админов)
 window.addAdmin = async function(newAdminUid) {
     if (!currentUser || !isAdmin(currentUser)) {
-        showNotification('Доступ запрещен', 'error');
+        if (typeof showNotification === 'function') showNotification('Доступ запрещен', 'error');
         return false;
     }
     
     if (!ADMIN_UIDs.includes(newAdminUid)) {
         ADMIN_UIDs.push(newAdminUid);
-        // Сохраняем в localStorage для persistence
         localStorage.setItem('eureka_admins', JSON.stringify(ADMIN_UIDs));
-        showNotification('Админ добавлен', 'success');
+        if (typeof showNotification === 'function') showNotification('Админ добавлен', 'success');
         return true;
     }
     return false;
@@ -35,7 +35,7 @@ window.addAdmin = async function(newAdminUid) {
 // Функция удаления админа
 window.removeAdmin = async function(adminUid) {
     if (!currentUser || !isAdmin(currentUser)) {
-        showNotification('Доступ запрещен', 'error');
+        if (typeof showNotification === 'function') showNotification('Доступ запрещен', 'error');
         return false;
     }
     
@@ -43,7 +43,7 @@ window.removeAdmin = async function(adminUid) {
     if (index > -1 && ADMIN_UIDs.length > 1) {
         ADMIN_UIDs.splice(index, 1);
         localStorage.setItem('eureka_admins', JSON.stringify(ADMIN_UIDs));
-        showNotification('Админ удален', 'success');
+        if (typeof showNotification === 'function') showNotification('Админ удален', 'success');
         return true;
     }
     return false;
@@ -91,10 +91,8 @@ window.renderAdminPanel = async function() {
         return;
     }
     
-    // Показываем загрузку
     container.innerHTML = '<div style="text-align:center; padding:2rem;">Загрузка статистики...</div>';
     
-    // Собираем статистику
     const stats = await collectStatistics();
     
     container.innerHTML = `
@@ -104,7 +102,6 @@ window.renderAdminPanel = async function() {
                 <p class="admin-subtitle">Управление платформой и аналитика</p>
             </div>
             
-            <!-- Статистика -->
             <div class="stats-grid">
                 <div class="stat-card-large">
                     <div class="stat-icon">👥</div>
@@ -140,7 +137,6 @@ window.renderAdminPanel = async function() {
                 </div>
             </div>
             
-            <!-- Дополнительная статистика -->
             <div class="stats-secondary">
                 <div class="stat-card">
                     <div class="stat-icon-small">📈</div>
@@ -164,7 +160,6 @@ window.renderAdminPanel = async function() {
                 </div>
             </div>
             
-            <!-- Таблица пользователей -->
             <div class="admin-section">
                 <h2 class="section-title">👥 Пользователи платформы</h2>
                 <div class="users-table-container">
@@ -198,7 +193,7 @@ window.renderAdminPanel = async function() {
                                     <td>${formatDateShort(user.createdAt)}</td>
                                     <td>
                                         <button class="admin-action-btn ${isAdmin({ uid: user.uid }) ? 'admin-active' : ''}" 
-                                                onclick="toggleAdminStatus('${user.uid}', '${user.name || user.email}')">
+                                                onclick="toggleAdminStatus('${user.uid}', '${(user.name || user.email || '').replace(/'/g, "\\'")}')">
                                             ${isAdmin({ uid: user.uid }) ? '👑 Убрать админа' : '⭐ Сделать админом'}
                                         </button>
                                     </td>
@@ -215,7 +210,6 @@ window.renderAdminPanel = async function() {
 // Сбор статистики
 async function collectStatistics() {
     try {
-        // Получаем всех пользователей из Firestore
         const usersSnapshot = await db.collection('users').get();
         const users = [];
         let totalLessons = 0;
@@ -254,7 +248,6 @@ async function collectStatistics() {
             }
         });
         
-        // Получаем курсы
         const coursesSnapshot = await db.collection('courses').get();
         let totalCourses = coursesSnapshot.size;
         let newCoursesThisMonth = 0;
@@ -265,7 +258,6 @@ async function collectStatistics() {
             if (createdAt > monthAgo) newCoursesThisMonth++;
         });
         
-        // Сортируем пользователей по дате регистрации
         users.sort((a, b) => {
             let dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
             let dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
@@ -283,7 +275,7 @@ async function collectStatistics() {
             graduates,
             averageProgress: users.length > 0 ? Math.round((totalProgress / (users.length * 18)) * 100) : 0,
             topStudent: topStudent,
-            users: users.slice(0, 50) // Показываем последних 50 пользователей
+            users: users.slice(0, 50)
         };
     } catch (error) {
         console.error('Ошибка сбора статистики:', error);
@@ -306,13 +298,13 @@ async function collectStatistics() {
 // Переключение статуса админа
 window.toggleAdminStatus = async function(uid, name) {
     if (!currentUser || !isAdmin(currentUser)) {
-        showNotification('Доступ запрещен', 'error');
+        if (typeof showNotification === 'function') showNotification('Доступ запрещен', 'error');
         return;
     }
     
     if (isAdmin({ uid })) {
         if (ADMIN_UIDs.length === 1) {
-            showNotification('Нельзя удалить последнего админа', 'error');
+            if (typeof showNotification === 'function') showNotification('Нельзя удалить последнего админа', 'error');
             return;
         }
         if (confirm(`Убрать права администратора у ${name}?`)) {
@@ -320,7 +312,7 @@ window.toggleAdminStatus = async function(uid, name) {
             if (index > -1) {
                 ADMIN_UIDs.splice(index, 1);
                 localStorage.setItem('eureka_admins', JSON.stringify(ADMIN_UIDs));
-                showNotification('Права администратора удалены', 'success');
+                if (typeof showNotification === 'function') showNotification('Права администратора удалены', 'success');
                 renderAdminPanel();
             }
         }
@@ -328,7 +320,7 @@ window.toggleAdminStatus = async function(uid, name) {
         if (confirm(`Дать права администратора ${name}?`)) {
             ADMIN_UIDs.push(uid);
             localStorage.setItem('eureka_admins', JSON.stringify(ADMIN_UIDs));
-            showNotification('Права администратора выданы', 'success');
+            if (typeof showNotification === 'function') showNotification('Права администратора выданы', 'success');
             renderAdminPanel();
         }
     }
@@ -341,6 +333,14 @@ function formatDateShort(date) {
     return d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit' });
 }
 
+// Escape HTML
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Добавляем стили для админ-панели
 const adminStyles = document.createElement('style');
 adminStyles.textContent = `
@@ -349,30 +349,25 @@ adminStyles.textContent = `
         margin: 0 auto;
         padding: 2rem;
     }
-    
     .admin-header {
         text-align: center;
         margin-bottom: 2rem;
     }
-    
     .admin-title {
         font-family: 'Manrope', sans-serif;
         font-size: 2rem;
         font-weight: 800;
         margin-bottom: 0.5rem;
     }
-    
     .admin-subtitle {
         color: var(--on-surface-variant);
     }
-    
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 1.5rem;
         margin-bottom: 2rem;
     }
-    
     .stat-card-large {
         background: var(--surface-lowest);
         border-radius: 1.5rem;
@@ -382,98 +377,80 @@ adminStyles.textContent = `
         gap: 1rem;
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
-    
     .stat-icon {
         font-size: 3rem;
     }
-    
     .stat-number {
         font-size: 2rem;
         font-weight: 800;
         color: var(--primary);
     }
-    
     .stat-label {
         font-size: 0.875rem;
         color: var(--on-surface-variant);
     }
-    
     .stat-change {
         font-size: 0.75rem;
         color: #10b981;
         margin-top: 0.25rem;
     }
-    
     .stats-secondary {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1rem;
         margin-bottom: 2rem;
     }
-    
     .stat-card {
         background: var(--surface-low);
         border-radius: 1rem;
         padding: 1rem;
         text-align: center;
     }
-    
     .stat-icon-small {
         font-size: 1.5rem;
         margin-bottom: 0.5rem;
     }
-    
     .stat-number-small {
         font-size: 1.5rem;
         font-weight: 700;
     }
-    
     .stat-label-small {
         font-size: 0.75rem;
         color: var(--on-surface-variant);
     }
-    
     .admin-section {
         background: var(--surface-lowest);
         border-radius: 1.5rem;
         padding: 1.5rem;
         margin-top: 2rem;
     }
-    
     .section-title {
         font-family: 'Manrope', sans-serif;
         font-size: 1.25rem;
         font-weight: 700;
         margin-bottom: 1rem;
     }
-    
     .users-table-container {
         overflow-x: auto;
     }
-    
     .users-table {
         width: 100%;
         border-collapse: collapse;
     }
-    
-    .users-table th,
-    .users-table td {
+    .users-table th, .users-table td {
         padding: 0.75rem;
         text-align: left;
         border-bottom: 1px solid var(--surface-container);
     }
-    
     .users-table th {
         font-weight: 600;
         color: var(--on-surface-variant);
         font-size: 0.75rem;
         text-transform: uppercase;
     }
-    
     .user-avatar-cell {
         font-size: 1.5rem;
     }
-    
     .progress-bar-small {
         width: 80px;
         height: 6px;
@@ -483,17 +460,14 @@ adminStyles.textContent = `
         display: inline-block;
         margin-right: 0.5rem;
     }
-    
     .progress-fill-small {
         height: 100%;
         background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
         border-radius: 3px;
     }
-    
     .progress-text {
         font-size: 0.75rem;
     }
-    
     .admin-action-btn {
         background: var(--surface-high);
         border: none;
@@ -503,11 +477,9 @@ adminStyles.textContent = `
         cursor: pointer;
         transition: all 0.2s;
     }
-    
     .admin-action-btn:hover {
         transform: scale(1.02);
     }
-    
     .admin-action-btn.admin-active {
         background: #fef3c7;
         color: #92400e;
