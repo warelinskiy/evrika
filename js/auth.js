@@ -269,6 +269,11 @@ function updateUIAfterLogin() {
     if (userMenu) userMenu.style.display = 'flex';
     if (typeof renderProfilePage === 'function') renderProfilePage();
   }
+  
+  // Обновляем кнопку админ-панели
+  if (typeof updateAdminButton === 'function') {
+    updateAdminButton();
+  }
 }
 
 window.logout = async function() {
@@ -284,6 +289,11 @@ window.logout = async function() {
     
     if (typeof showPage === 'function') showPage('landing');
     if (typeof showNotification === 'function') showNotification('Вы вышли из аккаунта', 'info');
+    
+    // Обновляем кнопку админ-панели
+    if (typeof updateAdminButton === 'function') {
+      updateAdminButton();
+    }
     
     console.log('👋 Выход выполнен');
   } catch(error) {
@@ -315,6 +325,11 @@ auth.onAuthStateChanged(async (user) => {
     if (authContainer) authContainer.style.display = 'flex';
     if (userMenu) userMenu.style.display = 'none';
     window.userData = null;
+    
+    // Обновляем кнопку админ-панели
+    if (typeof updateAdminButton === 'function') {
+      updateAdminButton();
+    }
   }
 });
 
